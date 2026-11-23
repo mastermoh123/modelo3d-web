@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generador Giro LiteDash v3 - VW Polo</title>
+  <title>Generador Giro LiteDash v4 - VW Polo</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -33,7 +33,7 @@
       font-size: 13px;
       color: #cbd5e1;
     }
-    input[type="range"] { width: 105px; cursor: pointer; }
+    input[type="range"] { width: 100px; cursor: pointer; }
     input[type="file"] { color: #cbd5e1; font-size: 13px; }
     select {
       background: #0f1319;
@@ -92,14 +92,14 @@
   </script>
 </head>
 <body>
-  <h2>Generador de Giro 360° para LiteDash (v3)</h2>
-  <p class="desc">Rotación horizontal pura de 360° (sin inclinaciones hacia techo o bajos), con dirección configurable y vista lateral ajustada.</p>
+  <h2>Generador de Giro 360° para LiteDash (v4)</h2>
+  <p class="desc">Giro en eje Y con corrección fija de inclinación (eje X / eje Z) para enderezar modelos .glb torcidos.</p>
 
   <div class="panel">
     <input type="file" id="fileInput" accept=".glb,.gltf" />
 
     <div class="control-group">
-      <label for="dirSelect">Sentido giro:</label>
+      <label for="dirSelect">Sentido Y:</label>
       <select id="dirSelect">
         <option value="1" selected>Horario (+Y)</option>
         <option value="-1">Antihorario (-Y)</option>
@@ -107,8 +107,20 @@
     </div>
 
     <div class="control-group">
+      <label for="fixXSlider">Corregir X (°):</label>
+      <input type="range" id="fixXSlider" min="-90" max="90" step="1" value="0" />
+      <span id="fixXVal">0°</span>
+    </div>
+
+    <div class="control-group">
+      <label for="fixZSlider">Corregir Z (°):</label>
+      <input type="range" id="fixZSlider" min="-90" max="90" step="1" value="0" />
+      <span id="fixZVal">0°</span>
+    </div>
+
+    <div class="control-group">
       <label for="heightSlider">Altura cámara:</label>
-      <input type="range" id="heightSlider" min="0.5" max="1.6" step="0.05" value="0.85" />
+      <input type="range" id="heightSlider" min="0.4" max="1.6" step="0.05" value="0.85" />
       <span id="heightVal">0.85</span>
     </div>
 
@@ -118,17 +130,11 @@
       <span id="distVal">4.6</span>
     </div>
 
-    <div class="control-group">
-      <label for="targetYSlider">Centro Y:</label>
-      <input type="range" id="targetYSlider" min="0.2" max="1.1" step="0.05" value="0.50" />
-      <span id="targetYVal">0.50</span>
-    </div>
-
-    <button id="resetCamBtn" type="button">Vista lateral limpia</button>
+    <button id="resetCamBtn" type="button">Restablecer</button>
     <button id="exportBtn" type="button" disabled>Generar y descargar 24 WebP + auto.json</button>
   </div>
 
-  <p id="status">Selecciona tu archivo polo.glb para previsualizar el giro horizontal.</p>
+  <p id="status">Selecciona tu archivo polo.glb y usa Corregir X / Z si el coche viene inclinado.</p>
 
   <div class="viewport-wrap">
     <canvas id="c" width="640" height="360"></canvas>
@@ -149,12 +155,15 @@
     const resetCamBtn = document.getElementById('resetCamBtn');
     const dirSelect = document.getElementById('dirSelect');
 
+    const fixXSlider = document.getElementById('fixXSlider');
+    const fixZSlider = document.getElementById('fixZSlider');
     const heightSlider = document.getElementById('heightSlider');
     const distSlider = document.getElementById('distSlider');
-    const targetYSlider = document.getElementById('targetYSlider');
+
+    const fixXVal = document.getElementById('fixXVal');
+    const fixZVal = document.getElementById('fixZVal');
     const heightVal = document.getElementById('heightVal');
     const distVal = document.getElementById('distVal');
-    const targetYVal = document.getElementById('targetYVal');
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -190,33 +199,48 @@
     scene.add(backLight);
 
     let carRoot = null;
+    let modelMesh = null;
     let isExporting = false;
 
-    function applyFramingFromSliders() {
-      const h = parseFloat(heightSlider.value);
-      const d = parseFloat(distSlider.value);
-      const ty = parseFloat(targetYSlider.value);
+    function applyModelTilt() {
+      if (!modelMesh) return;
+      const rx = THREE.MathUtils.degToRad(parseFloat(fixXSlider.value) || 0);
+      const rz = THREE.MathUtils.degToRad(parseFloat(fixZSlider.value) || 0);
+      modelMesh.rotation.x = rx;
+      modelMesh.rotation.z = rz;
+      modelMesh.updateMatrixWorld(true);
+    }
 
+    function applyFramingFromSliders() {
+      const fx = parseFloat(fixXSlider.value) || 0;
+      const fz = parseFloat(fixZSlider.value) || 0;
+      const h = parseFloat(heightSlider.value) || 0.85;
+      const d = parseFloat(distSlider.value) || 4.6;
+
+      fixXVal.textContent = `${fx}°`;
+      fixZVal.textContent = `${fz}°`;
       heightVal.textContent = h.toFixed(2);
       distVal.textContent = d.toFixed(1);
-      targetYVal.textContent = ty.toFixed(2);
+
+      applyModelTilt();
 
       const diag = d * 0.7071;
       camera.position.set(diag, h, diag);
-      controls.target.set(0, ty, 0);
+      controls.target.set(0, 0.50, 0);
       controls.update();
     }
 
     applyFramingFromSliders();
 
-    [heightSlider, distSlider, targetYSlider].forEach((slider) => {
+    [fixXSlider, fixZSlider, heightSlider, distSlider].forEach((slider) => {
       slider.addEventListener('input', applyFramingFromSliders);
     });
 
     resetCamBtn.addEventListener('click', () => {
+      fixXSlider.value = '0';
+      fixZSlider.value = '0';
       heightSlider.value = '0.85';
       distSlider.value = '4.6';
-      targetYSlider.value = '0.50';
       applyFramingFromSliders();
     });
 
@@ -233,30 +257,27 @@
           if (carRoot) scene.remove(carRoot);
 
           carRoot = new THREE.Group();
-          const model = gltf.scene;
+          modelMesh = gltf.scene;
 
-          const box = new THREE.Box3().setFromObject(model);
+          const box = new THREE.Box3().setFromObject(modelMesh);
           const size = box.getSize(new THREE.Vector3());
           const center = box.getCenter(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z, 0.001);
           const scale = 3.2 / maxDim;
 
-          model.scale.setScalar(scale);
-          model.position.set(
+          modelMesh.scale.setScalar(scale);
+          modelMesh.position.set(
             -center.x * scale,
             -box.min.y * scale,
             -center.z * scale
           );
 
-          carRoot.add(model);
+          carRoot.add(modelMesh);
           scene.add(carRoot);
 
-          const scaledHeight = size.y * scale;
-          targetYSlider.value = Math.min(1.1, Math.max(0.2, scaledHeight * 0.42)).toFixed(2);
           applyFramingFromSliders();
-
           exportBtn.disabled = false;
-          statusEl.textContent = 'Modelo cargado. El giro solo rotará en horizontal (eje Y).';
+          statusEl.textContent = 'Modelo cargado. Ajusta Corregir X / Z si está inclinado y exporta.';
           URL.revokeObjectURL(url);
         },
         undefined,
@@ -296,14 +317,14 @@
       resetCamBtn.disabled = true;
       dirSelect.disabled = true;
 
-      const originalRotation = carRoot.rotation.clone();
+      const originalRotationY = carRoot.rotation.y;
       const originalDamping = controls.enableDamping;
       const dir = parseFloat(dirSelect.value) || 1;
       controls.enableDamping = false;
+      applyModelTilt();
 
       try {
         for (let i = 0; i < FRAMES; i++) {
-          // Solo rotación horizontal alrededor del eje vertical (Y), sin inclinaciones X/Z
           carRoot.rotation.set(0, dir * (2 * Math.PI * i) / FRAMES, 0);
           carRoot.updateMatrixWorld(true);
           renderer.render(scene, camera);
@@ -340,7 +361,7 @@
         downloadBlob(new Blob([autoJson], { type: 'application/json' }), 'auto.json');
         statusEl.textContent = 'Listo: coloca 00.webp..23.webp dentro de giro/ y auto.json junto a giro/ en assets/cars/vw-polo/.';
       } finally {
-        carRoot.rotation.copy(originalRotation);
+        carRoot.rotation.y = originalRotationY;
         carRoot.updateMatrixWorld(true);
         controls.enableDamping = originalDamping;
         renderer.render(scene, camera);
