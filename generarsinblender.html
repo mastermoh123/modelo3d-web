@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generador Giro LiteDash</title>
+  <style>
+    body { font-family: sans-serif; background: #14171c; color: #eee; padding: 20px; }
+    canvas { background: transparent; border: 1px solid #333; display: block; margin: 16px 0; }
+    button, input { font-size: 15px; padding: 8px 14px; margin-right: 8px; }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <h3>Exportar polo.glb para LiteDash (24 cuadros .webp)</h3>
+  <input type="file" id="fileInput" accept=".glb,.gltf" />
+  <button id="exportBtn" disabled>Generar y descargar 24 WebP + auto.json</button>
+  <p id="status">Selecciona tu archivo polo.glb</p>
+  <canvas id="c" width="640" height="360"></canvas>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const FRAMES = 24;
+    const canvas = document.getElementById('c');
+    const status = document.getElementById('status');
+    const exportBtn = document.getElementById('exportBtn');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(640, 360);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 640 / 360, 0.1, 100);
+    camera.position.set(4.5, 1.8, 4.8);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+    const dir1 = new THREE.DirectionalLight(0xffffff, 2.0);
+    dir1.position.set(5, 8, 5);
+    scene.add(dir1);
+    const dir2 = new THREE.DirectionalLight(0xdde6ff, 1.0);
+    dir2.position.set(-5, 4, -5);
+    scene.add(dir2);
+
+    let carRoot = null;
+
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      new GLTFLoader().load(url, (gltf) => {
+        if (carRoot) scene.remove(carRoot);
+        carRoot = new THREE.Group();
+        const model = gltf.scene;
+
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const scale = 3.2 / Math.max(size.x, size.y, size.z, 0.001);
+
+        model.scale.setScalar(scale);
+        model.position.set(-center.x * scale, -box.min.y * scale, -center.z * scale);
+        carRoot.add(model);
+        scene.add(carRoot);
+
+        controls.target.set(0, (size.y * scale) * 0.45, 0);
+        controls.update();
+        exportBtn.disabled = false;
+        status.textContent = 'Ajusta el ángulo/zoom con el ratón si quieres y pulsa Generar.';
+      });
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    function downloadBlob(blob, filename) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }
+
+    exportBtn.addEventListener('click', async () => {
+      if (!carRoot) return;
+      exportBtn.disabled = true;
+      for (let i = 0; i < FRAMES; i++) {
+        carRoot.rotation.y = (2 * Math.PI * i) / FRAMES;
+        renderer.render(scene, camera);
+        const blob = await new Promise((res) => canvas.toBlob(res, 'image/webp', 0.85));
+        downloadBlob(blob, `${String(i).padStart(2, '0')}.webp`);
+        status.textContent = `Exportando ${i + 1}/${FRAMES}...`;
+        await new Promise((r) => setTimeout(r, 180));
+      }
+      const autoJson = JSON.stringify({
+        id: "vw-polo",
+        nombre: "Polo",
+        marca: "Volkswagen",
+        anio: 2003,
+        anios: "2002–2005",
+        autor: "Local",
+        licencia: "Personal",
+        fuente: "GLB local",
+        gris: 0.45,
+        giro: FRAMES
+      }, null, 2);
+      downloadBlob(new Blob([autoJson], { type: 'application/json' }), 'auto.json');
+      status.textContent = '¡Listo! Mete los 00..23.webp en giro/ y auto.json junto a ella.';
+      exportBtn.disabled = false;
+    });
+  </script>
+</body>
+</html>

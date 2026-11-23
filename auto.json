@@ -1,0 +1,284 @@
+{
+  "schema": "vw_polo_mk4_manifest_v14",
+  "generatedAt": "2026-11-22T23:34:58.215Z",
+  "modelSource": "polo.glb",
+  "totalImages": 23,
+  "format": "image/webp",
+  "captureOptions": {
+    "transparentBackground": true,
+    "gridHidden": true
+  },
+  "pose": {
+    "rotationDeg": {
+      "x": -90,
+      "y": 0,
+      "z": 0
+    },
+    "positionMeters": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "scale": 1,
+    "worldCenter": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "frames": [
+    {
+      "index": 1,
+      "file": "01.webp",
+      "label": "Giro 0°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 0,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 2,
+      "file": "02.webp",
+      "label": "Giro 20°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 20,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 3,
+      "file": "03.webp",
+      "label": "Giro 40°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 40,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 4,
+      "file": "04.webp",
+      "label": "Giro 60°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 60,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 5,
+      "file": "05.webp",
+      "label": "Giro 80°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 80,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 6,
+      "file": "06.webp",
+      "label": "Giro 100°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 100,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 7,
+      "file": "07.webp",
+      "label": "Giro 120°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 120,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 8,
+      "file": "08.webp",
+      "label": "Giro 140°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 140,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 9,
+      "file": "09.webp",
+      "label": "Giro 160°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 160,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 10,
+      "file": "10.webp",
+      "label": "Giro 180°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 180,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 11,
+      "file": "11.webp",
+      "label": "Giro 200°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 200,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 12,
+      "file": "12.webp",
+      "label": "Giro 220°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 220,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 13,
+      "file": "13.webp",
+      "label": "Giro 240°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 240,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 14,
+      "file": "14.webp",
+      "label": "Giro 260°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 260,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 15,
+      "file": "15.webp",
+      "label": "Giro 280°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 280,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 16,
+      "file": "16.webp",
+      "label": "Giro 300°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 300,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 17,
+      "file": "17.webp",
+      "label": "Giro 320°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 320,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 18,
+      "file": "18.webp",
+      "label": "Giro 340°",
+      "category": "ring_360",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 340,
+      "cameraElevationDeg": 16.2,
+      "cameraDistance": 6.11
+    },
+    {
+      "index": 19,
+      "file": "19.webp",
+      "label": "3/4 Frontal Alto",
+      "category": "elevated_34",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 35,
+      "cameraElevationDeg": 54.5,
+      "cameraDistance": 6.415
+    },
+    {
+      "index": 20,
+      "file": "20.webp",
+      "label": "3/4 Trasero Alto",
+      "category": "elevated_34",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 145,
+      "cameraElevationDeg": 54.5,
+      "cameraDistance": 6.415
+    },
+    {
+      "index": 21,
+      "file": "21.webp",
+      "label": "Cenital / Techo",
+      "category": "top_down",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": 0,
+      "cameraElevationDeg": 80.8,
+      "cameraDistance": 6.843
+    },
+    {
+      "index": 22,
+      "file": "22.webp",
+      "label": "3/4 Bajo Deportivo",
+      "category": "low_angle",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": -38,
+      "cameraElevationDeg": 2.9,
+      "cameraDistance": 6.232
+    },
+    {
+      "index": 23,
+      "file": "23.webp",
+      "label": "3/4 Trasero Bajo",
+      "category": "low_angle",
+      "transparentBackground": true,
+      "gridHidden": true,
+      "relativeYawDeg": -142,
+      "cameraElevationDeg": 4.1,
+      "cameraDistance": 6.232
+    }
+  ]
+}
