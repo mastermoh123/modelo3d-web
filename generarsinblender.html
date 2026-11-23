@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generador Giro LiteDash v6 - VW Polo</title>
+  <title>Generador Giro LiteDash v7 - VW Polo</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -92,8 +92,8 @@
   </script>
 </head>
 <body>
-  <h2>Generador de 24 Ángulos para LiteDash (v6)</h2>
-  <p class="desc">Recorre 24 ángulos combinando giro horizontal (puertas/laterales/frente/trasera) e inclinación vertical (techo y bajos del coche).</p>
+  <h2>Generador de 24 Ángulos para LiteDash (v7)</h2>
+  <p class="desc">Ruedas siempre apoyadas abajo y coche derecho: 24 ángulos combinando giro 360° (frente, puertas/laterales, trasera) con vistas desde techo y bajos sin dar vueltas de campana.</p>
 
   <div class="panel">
     <input type="file" id="fileInput" accept=".glb,.gltf" />
@@ -101,13 +101,13 @@
     <div class="control-group">
       <label for="modeSelect">Recorrido 24 cuadros:</label>
       <select id="modeSelect">
-        <option value="orbital" selected>360° + Techo y Bajos (24 ángulos)</option>
-        <option value="horizontal">Solo 360° horizontal (24 ángulos)</option>
+        <option value="mixed" selected>360° + Techo y Bajos (24 ángulos)</option>
+        <option value="turntable">Solo 360° lateral/puertas (24 ángulos)</option>
       </select>
     </div>
 
     <div class="control-group">
-      <label for="dirSelect">Sentido Y:</label>
+      <label for="dirSelect">Sentido giro:</label>
       <select id="dirSelect">
         <option value="1" selected>Horario (+Y)</option>
         <option value="-1">Antihorario (-Y)</option>
@@ -128,7 +128,7 @@
 
     <div class="control-group">
       <label for="distSlider">Distancia:</label>
-      <input type="range" id="distSlider" min="3.0" max="7.5" step="0.1" value="4.8" />
+      <input type="range" id="distSlider" min="3.2" max="7.5" step="0.1" value="4.8" />
       <span id="distVal">4.8</span>
     </div>
 
@@ -136,7 +136,7 @@
     <button id="exportBtn" type="button" disabled>Generar 24 ángulos + auto.json</button>
   </div>
 
-  <p id="status">Selecciona polo.glb; al generar recorrerá los 24 ángulos (laterales/puertas, techo y bajos).</p>
+  <p id="status">Selecciona polo.glb; el coche se mantendrá derecho mientras recorre los 24 ángulos.</p>
 
   <div class="viewport-wrap">
     <canvas id="c" width="640" height="360"></canvas>
@@ -179,7 +179,9 @@
     renderer.toneMappingExposure = 1.05;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(36, WIDTH / HEIGHT, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(35, WIDTH / HEIGHT, 0.1, 100);
+    // Fija explícitamente el vector "arriba" de la cámara en +Y para evitar giros de campana
+    camera.up.set(0, 1, 0);
 
     const controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
@@ -199,8 +201,8 @@
     backLight.position.set(0.0, 4.0, -6.5);
     scene.add(backLight);
 
-    const underFillLight = new THREE.DirectionalLight(0xcbd5e1, 1.15);
-    underFillLight.position.set(0.0, -5.5, 3.0);
+    const underFillLight = new THREE.DirectionalLight(0xcbd5e1, 1.25);
+    underFillLight.position.set(0.0, -5.0, 3.0);
     scene.add(underFillLight);
 
     let carRoot = null;
@@ -228,6 +230,7 @@
       applyModelTilt();
 
       const diag = d * 0.7071;
+      camera.up.set(0, 1, 0);
       camera.position.set(diag, 0.85, diag);
       controls.target.set(0, 0.45, 0);
       controls.update();
@@ -279,7 +282,7 @@
 
           applyFramingFromSliders();
           exportBtn.disabled = false;
-          statusEl.textContent = 'Modelo cargado. Pulsa Generar para recorrer los 24 ángulos automáticamente.';
+          statusEl.textContent = 'Modelo cargado. Al exportar girará 360° manteniendo el coche derecho.';
           URL.revokeObjectURL(url);
         },
         undefined,
@@ -315,38 +318,32 @@
       return new Promise((resolve) => requestAnimationFrame(() => resolve()));
     }
 
+    // Mantiene el coche sin volcar: solo gira en yaw (Y) y aplica elevación moderada (-28° a +36°)
     function poseForFrame(index, total, mode, dir, radius) {
       const t = (2 * Math.PI * index) / total;
       const yaw = dir * t;
 
-      if (mode === 'horizontal') {
-        const horizRadius = radius * 0.94;
-        camera.position.set(
-          Math.sin(yaw) * horizRadius,
-          0.55,
-          Math.cos(yaw) * horizRadius
-        );
+      carRoot.rotation.set(0, yaw, 0);
+      camera.up.set(0, 1, 0);
+
+      if (mode === 'turntable') {
+        camera.position.set(0, 0.72, radius * 0.95);
         camera.lookAt(0, 0.15, 0);
-        return '360° lateral/puertas';
+        return 'lateral / puertas 360°';
       }
 
-      // Recorrido orbital en 24 pasos: alterna laterales/puertas, techo (elevación positiva) y bajos (elevación negativa)
-      const elevWave = Math.sin(t * 2);
-      const maxElevationRad = THREE.MathUtils.degToRad(58);
-      const elevation = elevWave * maxElevationRad;
+      // Elevación suave entre -28° (bajos/ruedas) y +36° (techo/puertas) sin pasar por el polo cenital
+      const pitchDeg = Math.sin(t * 2) * 32 + 4;
+      const pitchRad = THREE.MathUtils.degToRad(pitchDeg);
 
-      const cosEl = Math.cos(elevation);
-      const sinEl = Math.sin(elevation);
+      const horizDist = radius * 0.94 * Math.cos(pitchRad);
+      const camY = radius * 0.94 * Math.sin(pitchRad) + 0.35;
 
-      camera.position.set(
-        Math.sin(yaw) * radius * cosEl,
-        radius * sinEl,
-        Math.cos(yaw) * radius * cosEl
-      );
-      camera.lookAt(0, 0, 0);
+      camera.position.set(0, camY, horizDist);
+      camera.lookAt(0, 0.10, 0);
 
-      if (elevation > 0.25) return 'techo + costado';
-      if (elevation < -0.25) return 'bajos + costado';
+      if (pitchDeg > 18) return 'techo + costado';
+      if (pitchDeg < -12) return 'bajos + costado';
       return 'puertas / costado';
     }
 
@@ -360,13 +357,13 @@
       dirSelect.disabled = true;
 
       const originalCamPos = camera.position.clone();
+      const originalCarRot = carRoot.rotation.clone();
       const originalDamping = controls.enableDamping;
       const mode = modeSelect.value;
       const dir = parseFloat(dirSelect.value) || 1;
       const radius = parseFloat(distSlider.value) || 4.8;
 
       controls.enableDamping = false;
-      carRoot.rotation.set(0, 0, 0);
       applyModelTilt();
 
       try {
@@ -411,7 +408,9 @@
         downloadBlob(new Blob([autoJson], { type: 'application/json' }), 'auto.json');
         statusEl.textContent = 'Listo (24 ángulos): pon 00.webp..23.webp dentro de giro/ y auto.json junto a giro/ en assets/cars/vw-polo/.';
       } finally {
+        camera.up.set(0, 1, 0);
         camera.position.copy(originalCamPos);
+        carRoot.rotation.copy(originalCarRot);
         controls.target.set(0, 0.45, 0);
         controls.enableDamping = originalDamping;
         controls.update();
