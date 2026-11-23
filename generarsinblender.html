@@ -3,2460 +3,1059 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VW Polo MK4 3-Door Visor 3D v12 — Pose Manual, 23 WebP y auto.json</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <title>VW Polo MK4 3-Door (2001-2009) - Visor 3D y Generador WebP / auto.json</title>
   <style>
+    :root {
+      --bg: #0c0f14;
+      --panel: #141923;
+      --panel-2: #1b2230;
+      --text: #e6ecf5;
+      --muted: #93a1b5;
+      --accent: #4da3ff;
+      --accent-2: #22c55e;
+      --border: #263042;
+      --warn: #f59e0b;
+    }
+
     * {
       box-sizing: border-box;
-    }
-
-    html, body {
       margin: 0;
       padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #090d16;
-      color: #f8fafc;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    #viewer-stage {
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) 390px;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 58vh auto;
+      }
+    }
+
+    #viewport-wrap {
       position: relative;
       width: 100%;
       height: 100%;
-      min-height: 440px;
+      min-height: 360px;
       overflow: hidden;
-      background: radial-gradient(circle at 50% 25%, #1b2840 0%, #0d1320 60%, #060911 100%);
+      background: radial-gradient(circle at 50% 35%, #1d2636 0%, #0d1118 72%);
+      border-right: 1px solid var(--border);
+      user-select: none;
       touch-action: none;
     }
 
-    #viewer-canvas {
+    #gl-canvas {
       display: block;
       width: 100%;
       height: 100%;
-      cursor: grab;
     }
 
-    #viewer-canvas.dragging {
-      cursor: grabbing;
-    }
-
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.80);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      border-radius: 14px;
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
-    }
-
-    .ui-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 7px 11px;
-      min-height: 36px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #e2e8f0;
-      background: rgba(30, 41, 59, 0.78);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      cursor: pointer;
-      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, color 0.15s ease;
-    }
-
-    .ui-btn:hover:not(:disabled) {
-      background: rgba(51, 65, 85, 0.94);
-      border-color: rgba(148, 163, 184, 0.4);
-      color: #ffffff;
-    }
-
-    .ui-btn:active:not(:disabled) {
-      transform: scale(0.97);
-    }
-
-    .ui-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .ui-btn.active {
-      background: rgba(37, 99, 235, 0.34);
-      border-color: rgba(96, 165, 250, 0.8);
-      color: #dbeafe;
-    }
-
-    .ui-btn.primary {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      border-color: rgba(147, 197, 253, 0.55);
-      color: #ffffff;
-      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
-    }
-
-    .ui-btn.primary:hover:not(:disabled) {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-    }
-
-    .ui-btn.emerald {
-      background: linear-gradient(135deg, #059669, #047857);
-      border-color: rgba(110, 231, 183, 0.5);
-      color: #ecfdf5;
-    }
-
-    .ui-btn.emerald:hover:not(:disabled) {
-      background: linear-gradient(135deg, #10b981, #059669);
-    }
-
-    .step-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 7px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #e2e8f0;
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.14s ease;
-    }
-
-    .step-btn:hover {
-      background: rgba(59, 130, 246, 0.35);
-      border-color: rgba(96, 165, 250, 0.65);
-    }
-
-    .num-input {
-      width: 68px;
-      padding: 3px 6px;
-      border-radius: 7px;
-      font-size: 11.5px;
-      font-weight: 600;
-      text-align: right;
-      color: #f8fafc;
-      background: rgba(2, 6, 23, 0.72);
-      border: 1px solid rgba(148, 163, 184, 0.24);
-      outline: none;
-    }
-
-    .num-input:focus {
-      border-color: #60a5fa;
-    }
-
-    input[type="range"].pose-slider {
-      width: 100%;
-      accent-color: #3b82f6;
-      cursor: pointer;
-    }
-
-    /* Left Pose & Capture Dock */
-    #pose-panel {
+    .hud-top {
       position: absolute;
-      top: 66px;
-      left: 12px;
-      width: min(355px, calc(100vw - 24px));
-      max-height: calc(100% - 140px);
-      overflow-y: auto;
-      z-index: 25;
-      padding: 14px;
-      transform: translateX(0);
-      opacity: 1;
-      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
-    }
-
-    #pose-panel.collapsed {
-      transform: translateX(calc(-100% - 24px));
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* Right Studio & Gallery Drawer */
-    #studio-panel {
-      position: absolute;
-      top: 66px;
-      right: 12px;
-      width: min(350px, calc(100vw - 24px));
-      max-height: calc(100% - 140px);
-      overflow-y: auto;
-      z-index: 25;
-      padding: 14px;
-      transform: translateX(calc(100% + 24px));
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
-    }
-
-    #studio-panel.open {
-      transform: translateX(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* Bottom capture & camera bar */
-    #bottom-bar {
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 24;
-      max-width: calc(100vw - 20px);
-      padding: 8px 10px;
+      top: 14px;
+      left: 14px;
+      right: 14px;
       display: flex;
       flex-wrap: wrap;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .capture-thumb-card {
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid rgba(148, 163, 184, 0.24);
-      background: rgba(2, 6, 23, 0.85);
-    }
-
-    .capture-thumb-card img {
-      display: block;
-      width: 100%;
-      height: 68px;
-      object-fit: cover;
-    }
-
-    .paint-swatch {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      border: 2px solid rgba(255, 255, 255, 0.25);
-      cursor: pointer;
-      transition: transform 0.14s ease;
-    }
-
-    .paint-swatch:hover {
-      transform: scale(1.08);
-    }
-
-    .paint-swatch.active {
-      border-color: #ffffff;
-      box-shadow: 0 0 0 2px #3b82f6;
-    }
-
-    #drop-zone-overlay {
-      position: absolute;
-      inset: 12px;
-      z-index: 45;
-      border-radius: 16px;
-      border: 2px dashed #60a5fa;
-      background: rgba(15, 23, 42, 0.9);
-      backdrop-filter: blur(8px);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       gap: 8px;
       pointer-events: none;
     }
 
-    #drop-zone-overlay.visible {
-      display: flex;
-    }
-
-    #toast-banner {
-      position: absolute;
-      bottom: 68px;
-      left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      z-index: 50;
-      padding: 8px 14px;
-      border-radius: 999px;
+    .badge {
+      background: rgba(20, 25, 35, 0.82);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      padding: 6px 11px;
+      border-radius: 8px;
       font-size: 12px;
-      font-weight: 500;
-      color: #f8fafc;
-      background: rgba(15, 23, 42, 0.94);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      white-space: nowrap;
+      color: var(--text);
+      pointer-events: auto;
     }
 
-    #toast-banner.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+    .badge strong {
+      color: var(--accent);
     }
 
-    #embed-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 70;
-      background: rgba(2, 6, 23, 0.78);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    #embed-modal.open {
+    .hud-bottom {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      right: 14px;
       display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .hud-bottom button {
+      pointer-events: auto;
+      background: rgba(20, 25, 35, 0.86);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .hud-bottom button:hover {
+      border-color: var(--accent);
+    }
+
+    #controls {
+      background: var(--panel);
+      padding: 16px;
+      overflow-y: auto;
+      max-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .group {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .group-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+    }
+
+    label.row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      gap: 8px;
+    }
+
+    label.check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    input[type="range"] {
+      width: 145px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
+    input[type="text"] {
+      width: 135px;
+    }
+
+    input[type="number"] {
+      width: 72px;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+
+    .btn-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    button.action {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    button.action:hover {
+      border-color: var(--accent);
+    }
+
+    button.action.primary {
+      background: var(--accent);
+      color: #07101d;
+      border-color: var(--accent);
+    }
+
+    button.action.success {
+      background: var(--accent-2);
+      color: #06150b;
+      border-color: var(--accent-2);
+    }
+
+    button.action.active-mode {
+      border-color: var(--warn);
+      box-shadow: inset 0 0 0 1px var(--warn);
+    }
+
+    .dropzone {
+      border: 1px dashed #3b4b66;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      background: rgba(12, 15, 20, 0.45);
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent);
+      color: var(--text);
+      background: rgba(77, 163, 255, 0.1);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .status-line {
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 18px;
     }
   </style>
 </head>
 <body>
-  <div id="viewer-stage" role="region" aria-label="Visor 3D VW Polo MK4 3 Puertas v12">
-    <canvas id="viewer-canvas"></canvas>
+  <div id="viewport-wrap">
+    <canvas id="gl-canvas"></canvas>
 
-    <!-- Top Header Bar -->
-    <header class="absolute top-3 left-3 right-3 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-      <div class="glass-panel px-3.5 py-2 pointer-events-auto flex items-center gap-3">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs sm:text-sm font-semibold text-white tracking-tight">
-              VW Polo MK4 3 Puertas (2001–2009)
-            </span>
-            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-300 border border-emerald-400/35">
-              v12 • 23 WebP + auto.json
-            </span>
-          </div>
-          <p id="status-bar-text" class="text-[11px] text-slate-300 truncate max-w-[230px] sm:max-w-[420px]">
-            Pose libre activa • Sin sobrescritura automática
-          </p>
-        </div>
+    <div class="hud-top">
+      <div class="badge">
+        Modo raton: <span id="mode-label">Camara (Orbit)</span>
       </div>
-
-      <div class="flex flex-wrap items-center gap-1.5 pointer-events-auto">
-        <button id="btn-toggle-pose-panel" type="button" class="ui-btn active" title="Mostrar/ocultar panel de pose y capturas">
-          <span>🎛️</span>
-          <span>Pose y 23 WebP</span>
-        </button>
-
-        <!-- Drag interaction mode: Camera Orbit vs Direct Model Rotation -->
-        <div class="glass-panel p-0.5 flex items-center gap-0.5 !rounded-[11px]">
-          <button id="drag-mode-camera" type="button" class="ui-btn active !min-h-[32px] !py-1 !px-2.5 text-[11px]" title="Arrastrar para mover la cámara">
-            📷 Mover cámara
-          </button>
-          <button id="drag-mode-model" type="button" class="ui-btn !min-h-[32px] !py-1 !px-2.5 text-[11px]" title="Arrastrar sobre el lienzo para rotar el modelo en X/Y/Z">
-            🔄 Rotar modelo
-          </button>
-        </div>
-
-        <button id="btn-upload-gltf" type="button" class="ui-btn" title="Cargar archivo .glb o .gltf">
-          <span>📂</span>
-          <span class="hidden sm:inline">Cargar GLB/GLTF</span>
-        </button>
-
-        <button id="btn-open-studio" type="button" class="ui-btn" title="Ajustes de estudio, pintura y galería">
-          <span>🎨</span>
-          <span class="hidden md:inline">Estudio y Galería</span>
-        </button>
-
-        <button id="btn-open-embed" type="button" class="ui-btn" title="Código para insertar en Google Sites">
-          <span>🌐</span>
-          <span class="hidden lg:inline">Google Sites</span>
-        </button>
-      </div>
-    </header>
-
-    <input id="file-input-model" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" class="hidden" />
-
-    <!-- Left Dock: Manual Pose Controls & 23 WebP + auto.json Batch -->
-    <aside id="pose-panel" class="glass-panel text-xs text-slate-200 space-y-4" aria-label="Control manual de pose, 23 WebP y auto.json">
-      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2">
-        <div>
-          <h2 class="text-sm font-semibold text-white">Pose Manual del Modelo</h2>
-          <p class="text-[11px] text-slate-400">Colócalo como quieras y genera 23 WebP + auto.json</p>
-        </div>
-        <button id="btn-collapse-pose" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[11px]">✕</button>
-      </div>
-
-      <!-- Rotación X, Y, Z (-180° a +180°) -->
-      <div class="space-y-3">
-        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-          Rotación (Grados: -180° a +180°)
-        </div>
-
-        <!-- Rotación X (Pitch) -->
-        <div class="rounded-xl bg-slate-900/65 border border-slate-800 p-2.5 space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <label for="rot-x-num" class="font-medium text-slate-200">Rotación X (Pitch)</label>
-            <div class="flex items-center gap-1">
-              <button type="button" class="step-btn" data-axis="rx" data-delta="-5" title="-5°">-5</button>
-              <button type="button" class="step-btn" data-axis="rx" data-delta="-1" title="-1°">-1</button>
-              <input id="rot-x-num" type="number" min="-180" max="180" step="0.5" value="0" class="num-input" />
-              <button type="button" class="step-btn" data-axis="rx" data-delta="1" title="+1°">+1</button>
-              <button type="button" class="step-btn" data-axis="rx" data-delta="5" title="+5°">+5</button>
-            </div>
-          </div>
-          <input id="rot-x-slider" type="range" min="-180" max="180" step="0.5" value="0" class="pose-slider" />
-        </div>
-
-        <!-- Rotación Y (Yaw) -->
-        <div class="rounded-xl bg-slate-900/65 border border-slate-800 p-2.5 space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <label for="rot-y-num" class="font-medium text-slate-200">Rotación Y (Yaw)</label>
-            <div class="flex items-center gap-1">
-              <button type="button" class="step-btn" data-axis="ry" data-delta="-5" title="-5°">-5</button>
-              <button type="button" class="step-btn" data-axis="ry" data-delta="-1" title="-1°">-1</button>
-              <input id="rot-y-num" type="number" min="-180" max="180" step="0.5" value="0" class="num-input" />
-              <button type="button" class="step-btn" data-axis="ry" data-delta="1" title="+1°">+1</button>
-              <button type="button" class="step-btn" data-axis="ry" data-delta="5" title="+5°">+5</button>
-            </div>
-          </div>
-          <input id="rot-y-slider" type="range" min="-180" max="180" step="0.5" value="0" class="pose-slider" />
-        </div>
-
-        <!-- Rotación Z (Roll) -->
-        <div class="rounded-xl bg-slate-900/65 border border-slate-800 p-2.5 space-y-1.5">
-          <div class="flex items-center justify-between gap-2">
-            <label for="rot-z-num" class="font-medium text-slate-200">Rotación Z (Roll)</label>
-            <div class="flex items-center gap-1">
-              <button type="button" class="step-btn" data-axis="rz" data-delta="-5" title="-5°">-5</button>
-              <button type="button" class="step-btn" data-axis="rz" data-delta="-1" title="-1°">-1</button>
-              <input id="rot-z-num" type="number" min="-180" max="180" step="0.5" value="0" class="num-input" />
-              <button type="button" class="step-btn" data-axis="rz" data-delta="1" title="+1°">+1</button>
-              <button type="button" class="step-btn" data-axis="rz" data-delta="5" title="+5°">+5</button>
-            </div>
-          </div>
-          <input id="rot-z-slider" type="range" min="-180" max="180" step="0.5" value="0" class="pose-slider" />
-        </div>
-      </div>
-
-      <!-- Posición X, Y, Z y Escala -->
-      <div class="space-y-2.5 border-t border-slate-700/70 pt-3">
-        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-          Posición (X, Y, Z) y Escala
-        </div>
-
-        <div class="grid grid-cols-3 gap-2">
-          <div class="rounded-lg bg-slate-900/65 border border-slate-800 p-2 space-y-1">
-            <div class="flex items-center justify-between text-[11px]">
-              <label for="pos-x-input" class="text-slate-300 font-medium">Pos X</label>
-              <span id="pos-x-read" class="text-slate-400">0.00</span>
-            </div>
-            <input id="pos-x-input" type="number" step="0.1" value="0" class="num-input !w-full text-center" />
-            <input id="pos-x-slider" type="range" min="-4" max="4" step="0.05" value="0" class="pose-slider" />
-          </div>
-
-          <div class="rounded-lg bg-slate-900/65 border border-slate-800 p-2 space-y-1">
-            <div class="flex items-center justify-between text-[11px]">
-              <label for="pos-y-input" class="text-slate-300 font-medium">Pos Y</label>
-              <span id="pos-y-read" class="text-slate-400">0.00</span>
-            </div>
-            <input id="pos-y-input" type="number" step="0.05" value="0" class="num-input !w-full text-center" />
-            <input id="pos-y-slider" type="range" min="-2" max="3.5" step="0.02" value="0" class="pose-slider" />
-          </div>
-
-          <div class="rounded-lg bg-slate-900/65 border border-slate-800 p-2 space-y-1">
-            <div class="flex items-center justify-between text-[11px]">
-              <label for="pos-z-input" class="text-slate-300 font-medium">Pos Z</label>
-              <span id="pos-z-read" class="text-slate-400">0.00</span>
-            </div>
-            <input id="pos-z-input" type="number" step="0.1" value="0" class="num-input !w-full text-center" />
-            <input id="pos-z-slider" type="range" min="-4" max="4" step="0.05" value="0" class="pose-slider" />
-          </div>
-        </div>
-
-        <div class="rounded-lg bg-slate-900/65 border border-slate-800 p-2.5 space-y-1">
-          <div class="flex items-center justify-between text-[11px]">
-            <label for="scale-input" class="text-slate-200 font-medium">Escala del modelo</label>
-            <div class="flex items-center gap-1.5">
-              <input id="scale-input" type="number" min="0.2" max="3.0" step="0.05" value="1.00" class="num-input !w-16 text-center" />
-              <span class="text-slate-400">×</span>
-            </div>
-          </div>
-          <input id="scale-slider" type="range" min="0.25" max="2.5" step="0.05" value="1.00" class="pose-slider" />
-        </div>
-      </div>
-
-      <!-- Botones rápidos de pose -->
-      <div class="space-y-2 border-t border-slate-700/70 pt-3">
-        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-          Atajos de Pose
-        </div>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-ground-y0" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]">
-            ⬇️ Apoyar en suelo (Y=0)
-          </button>
-          <button id="btn-side-upright" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]">
-            📐 Poner vertical/lateral
-          </button>
-          <button id="btn-reset-pose" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]">
-            ↩️ Resetear pose (0°,0°,0°)
-          </button>
-          <button id="btn-save-pose" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]">
-            💾 Guardar pose personalizada
-          </button>
-        </div>
-        <button id="btn-restore-saved-pose" type="button" class="ui-btn w-full !py-1.5 text-[11px]" disabled>
-          ⭐ Restaurar pose guardada
-        </button>
-      </div>
-
-      <!-- Generador de 23 Fotos WebP + auto.json según la pose actual -->
-      <div class="space-y-2 border-t border-slate-700/70 pt-3">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            Pack 23 WebP + auto.json
-          </span>
-          <span id="webp-codec-badge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-            WebP nativo / fallback
-          </span>
-        </div>
-
-        <button id="btn-capture-single-webp" type="button" class="ui-btn w-full !py-1.5 text-xs">
-          📸 Capturar vista actual (WebP)
-        </button>
-
-        <button id="btn-generate-23-webp" type="button" class="ui-btn emerald w-full !py-2 text-xs font-semibold">
-          ⚡ Generar 23 WebP + auto.json según mi pose
-        </button>
-
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="btn-download-auto-json" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]" disabled>
-            📄 Descargar auto.json
-          </button>
-          <button id="btn-download-all-webp" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]" disabled>
-            ⬇️ Descargar 23 WebP
-          </button>
-        </div>
-
-        <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
-          <div id="webp-progress-bar" class="h-full bg-emerald-500 transition-all duration-150" style="width: 0%;"></div>
-        </div>
-
-        <div id="capture-progress-label" class="text-[11px] text-slate-300 text-center leading-snug">
-          Listo para generar 23 vistas WebP + <strong>auto.json</strong> respetando tu pose actual.
-        </div>
-      </div>
-    </aside>
-
-    <!-- Right Drawer: Studio Appearance, Model Info & Capture Gallery -->
-    <aside id="studio-panel" class="glass-panel text-xs text-slate-200 space-y-4" aria-label="Estudio, modelo y galería de capturas">
-      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2">
-        <span class="text-sm font-semibold text-white">Estudio, auto.json y Galería</span>
-        <button id="btn-close-studio" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[11px]">✕</button>
-      </div>
-
-      <!-- Pintura MK4 -->
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Pintura Carrocería</span>
-          <span id="paint-active-name" class="text-[11px] text-slate-300">Blanco Candy</span>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <button type="button" class="paint-swatch active" data-color="#f1f5f9" data-name="Blanco Candy" style="background:#f1f5f9;" title="Blanco Candy"></button>
-          <button type="button" class="paint-swatch" data-color="#1e293b" data-name="Negro Mágico" style="background:#1e293b;" title="Negro Mágico"></button>
-          <button type="button" class="paint-swatch" data-color="#94a3b8" data-name="Plata Reflex" style="background:#94a3b8;" title="Plata Reflex"></button>
-          <button type="button" class="paint-swatch" data-color="#dc2626" data-name="Rojo Tornado" style="background:#dc2626;" title="Rojo Tornado"></button>
-          <button type="button" class="paint-swatch" data-color="#2563eb" data-name="Azul Jazz" style="background:#2563eb;" title="Azul Jazz"></button>
-          <button type="button" class="paint-swatch" data-color="#15803d" data-name="Verde Highland" style="background:#15803d;" title="Verde Highland"></button>
-        </div>
-      </div>
-
-      <!-- Luz y entorno -->
-      <div class="space-y-2 border-t border-slate-700/70 pt-3">
-        <div class="flex items-center justify-between">
-          <label for="studio-light-slider" class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            Iluminación de Estudio
-          </label>
-          <span id="studio-light-val" class="text-[11px] text-slate-300">1.25×</span>
-        </div>
-        <input id="studio-light-slider" type="range" min="0.35" max="2.4" step="0.05" value="1.25" class="pose-slider" />
-
-        <div class="grid grid-cols-2 gap-1.5 pt-1">
-          <button id="btn-toggle-grid" type="button" class="ui-btn active !py-1.5 !px-2 text-[11px]">
-            ⊞ Cuadrícula Y=0
-          </button>
-          <button id="btn-toggle-bg" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]">
-            🌑 Fondo Claro/Oscuro
-          </button>
-        </div>
-      </div>
-
-      <!-- Modelo actual -->
-      <div class="space-y-2 border-t border-slate-700/70 pt-3">
-        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Modelo Activo</div>
-        <button id="btn-use-builtin" type="button" class="ui-btn w-full !py-1.5 text-[11px]">
-          🚗 Volver al Polo MK4 3 Puertas integrado
-        </button>
-        <div class="rounded-lg bg-slate-900/80 border border-slate-800 p-2.5 text-[11px] text-slate-300 space-y-1">
-          <div>Origen: <span id="info-source" class="text-white font-medium">Polo MK4 3P (Integrado)</span></div>
-          <div>Mallas / Triángulos: <span id="info-geometry" class="text-white font-medium">Calculando...</span></div>
-          <div>Borde inferior actual: <span id="info-miny" class="text-emerald-400 font-medium">Y = 0.00m</span></div>
-        </div>
-      </div>
-
-      <!-- Vista previa de auto.json -->
-      <div class="space-y-1.5 border-t border-slate-700/70 pt-3">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Vista previa auto.json</span>
-          <button id="btn-copy-auto-json" type="button" class="ui-btn !min-h-0 !px-2 !py-0.5 text-[10px]" disabled>
-            📋 Copiar JSON
-          </button>
-        </div>
-        <textarea id="auto-json-preview" rows="5" readonly class="w-full p-2 rounded-lg bg-slate-950 border border-slate-800 text-[10.5px] font-mono text-emerald-300 resize-none" placeholder="Genera el pack de 23 WebP para ver y descargar auto.json aquí..."></textarea>
-      </div>
-
-      <!-- Galería de capturas WebP -->
-      <div class="space-y-2 border-t border-slate-700/70 pt-3">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            Capturas WebP (<span id="gallery-count">0</span>)
-          </span>
-          <div class="flex items-center gap-1">
-            <button id="btn-download-all-gallery" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[10.5px]" disabled>
-              ⬇️ Todas
-            </button>
-            <button id="btn-clear-captures" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[10.5px]" disabled>
-              🗑️ Limpiar
-            </button>
-          </div>
-        </div>
-        <div id="captures-gallery" class="grid grid-cols-2 gap-2">
-          <div class="col-span-2 text-center py-4 text-[11px] text-slate-400 rounded-lg bg-slate-900/50 border border-slate-800/80">
-            Aún no hay capturas. Pulsa "Generar 23 WebP + auto.json según mi pose".
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Bottom Quick Bar -->
-    <nav id="bottom-bar" class="glass-panel" aria-label="Acciones rápidas de cámara y captura">
-      <button id="quick-reset-cam" type="button" class="ui-btn !py-1.5 !px-2.5 text-[11px]" title="Centrar cámara en el modelo">
-        🎯 Centrar cámara
-      </button>
-      <button id="quick-front-cam" type="button" class="ui-btn !py-1.5 !px-2.5 text-[11px]" title="Vista frontal del escenario">
-        Frente
-      </button>
-      <button id="quick-side-cam" type="button" class="ui-btn !py-1.5 !px-2.5 text-[11px]" title="Vista lateral del escenario">
-        Lateral
-      </button>
-      <button id="quick-top-cam" type="button" class="ui-btn !py-1.5 !px-2.5 text-[11px]" title="Vista superior del escenario">
-        Superior
-      </button>
-      <span class="hidden sm:inline-block h-5 w-px bg-slate-700/80 mx-0.5"></span>
-      <button id="quick-capture-webp" type="button" class="ui-btn primary !py-1.5 !px-3 text-[11px]">
-        📸 Capturar WebP
-      </button>
-      <button id="quick-23-webp-json" type="button" class="ui-btn emerald !py-1.5 !px-3 text-[11px]">
-        ⚡ 23 WebP + auto.json
-      </button>
-    </nav>
-
-    <!-- Drag & Drop Overlay -->
-    <div id="drop-zone-overlay">
-      <div class="text-3xl">🚘</div>
-      <div class="text-sm font-semibold text-white">Suelta aquí tu archivo .GLB o .GLTF</div>
-      <div class="text-xs text-slate-300">Se cargará conservando tu pose manual</div>
+      <div class="badge" id="pose-readout">Yaw: 0° · Pitch: 0° · Roll: 0°</div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast-banner" role="status" aria-live="polite"></div>
-  </div>
-
-  <!-- Google Sites Embed Modal -->
-  <div id="embed-modal" role="dialog" aria-modal="true" aria-labelledby="embed-modal-heading">
-    <div class="glass-panel w-full max-w-lg p-5 space-y-4 text-slate-100">
-      <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
-        <div>
-          <h2 id="embed-modal-heading" class="text-sm font-semibold text-white">Insertar en Google Sites (v12)</h2>
-          <p class="text-[11px] text-slate-400">
-            En Google Sites: <strong class="text-slate-200">Insertar &gt; Incorporar &gt; Código incorporado</strong>.
-          </p>
-        </div>
-        <button id="btn-close-embed" type="button" class="ui-btn !min-h-0 !px-2.5 !py-1 text-xs">✕</button>
-      </div>
-
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between">
-          <label for="embed-snippet-area" class="text-xs font-medium text-slate-300">Código &lt;iframe&gt; adaptable</label>
-          <button id="btn-copy-snippet" type="button" class="ui-btn active !min-h-0 !px-2.5 !py-1 text-[11px]">
-            📋 Copiar código
-          </button>
-        </div>
-        <textarea id="embed-snippet-area" rows="5" readonly class="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-blue-300 resize-none"></textarea>
-      </div>
-
-      <div class="rounded-lg bg-slate-900/80 border border-slate-800 p-3 text-[11px] text-slate-300 space-y-1">
-        <div>• Genera 23 imágenes <code class="text-emerald-300">auto_01.webp</code> … <code class="text-emerald-300">auto_23.webp</code> y el manifiesto <code class="text-emerald-300">auto.json</code>.</div>
-        <div>• Incluye conversión automática PNG-a-WebP vía canvas si el navegador limita la codificación directa.</div>
-      </div>
+    <div class="hud-bottom">
+      <button type="button" data-preset="3q-front">3/4 Frontal</button>
+      <button type="button" data-preset="side">Lateral</button>
+      <button type="button" data-preset="3q-rear">3/4 Trasera</button>
+      <button type="button" data-preset="top">Cenital</button>
+      <button type="button" data-preset="reset">Centrar vista</button>
     </div>
   </div>
 
-  <script>
-    (function () {
-      'use strict';
+  <aside id="controls">
+    <div>
+      <h1>Menú</h1>
+      <p class="sub">Arrastra el canvas para orbitar o girar el modelo (R = alternar giro de modelo, Espacio = giro automatico).</p>
+    </div>
 
-      // =========================================================================
-      // 1. DOM ELEMENTS & APPLICATION STATE
-      // =========================================================================
-      const stageEl = document.getElementById('viewer-stage');
-      const canvasEl = document.getElementById('viewer-canvas');
-      const statusTextEl = document.getElementById('status-bar-text');
-      const toastEl = document.getElementById('toast-banner');
-      const dropOverlayEl = document.getElementById('drop-zone-overlay');
-      const fileInputEl = document.getElementById('file-input-model');
+    <div class="group">
+      <div class="group-title">Modelo GLB / GLTF</div>
+      <div id="dropzone" class="dropzone">
+        Arrastra aqui un archivo <strong>.glb</strong> o <strong>.gltf</strong>, o pulsa para elegirlo
+      </div>
+      <input type="file" id="glb-input" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" hidden />
+      <div class="btn-grid">
+        <button type="button" class="action" id="btn-choose-glb">Cargar .glb</button>
+        <button type="button" class="action" id="btn-reset-model">Modelo base 3P</button>
+      </div>
+    </div>
 
-      const posePanelEl = document.getElementById('pose-panel');
-      const studioPanelEl = document.getElementById('studio-panel');
-      const btnTogglePosePanel = document.getElementById('btn-toggle-pose-panel');
-      const btnCollapsePose = document.getElementById('btn-collapse-pose');
-      const btnOpenStudio = document.getElementById('btn-open-studio');
-      const btnCloseStudio = document.getElementById('btn-close-studio');
+    <div class="group">
+      <div class="group-title">Interaccion y pose</div>
+      <div class="btn-grid">
+        <button type="button" class="action" id="btn-toggle-drag">Rotar modelo (R)</button>
+        <button type="button" class="action" id="btn-toggle-spin">Giro auto (Espacio)</button>
+      </div>
 
-      const dragModeCameraBtn = document.getElementById('drag-mode-camera');
-      const dragModeModelBtn = document.getElementById('drag-mode-model');
-      const btnUploadGltf = document.getElementById('btn-upload-gltf');
-      const btnOpenEmbed = document.getElementById('btn-open-embed');
-      const btnUseBuiltin = document.getElementById('btn-use-builtin');
+      <label class="row">
+        <span>Yaw (orientacion)</span>
+        <span id="val-yaw">0°</span>
+        <input type="range" id="rng-yaw" min="-180" max="180" step="1" value="0" />
+      </label>
 
-      // Pose inputs (sliders + numeric inputs)
-      const rotXSlider = document.getElementById('rot-x-slider');
-      const rotXNum = document.getElementById('rot-x-num');
-      const rotYSlider = document.getElementById('rot-y-slider');
-      const rotYNum = document.getElementById('rot-y-num');
-      const rotZSlider = document.getElementById('rot-z-slider');
-      const rotZNum = document.getElementById('rot-z-num');
+      <label class="row">
+        <span>Pitch (inclinacion)</span>
+        <span id="val-pitch">0°</span>
+        <input type="range" id="rng-pitch" min="-180" max="180" step="1" value="0" />
+      </label>
 
-      const posXSlider = document.getElementById('pos-x-slider');
-      const posXInput = document.getElementById('pos-x-input');
-      const posXRead = document.getElementById('pos-x-read');
+      <label class="row">
+        <span>Roll (balanceo)</span>
+        <span id="val-roll">0°</span>
+        <input type="range" id="rng-roll" min="-35" max="35" step="1" value="0" />
+      </label>
 
-      const posYSlider = document.getElementById('pos-y-slider');
-      const posYInput = document.getElementById('pos-y-input');
-      const posYRead = document.getElementById('pos-y-read');
+      <label class="row">
+        <span>Escala del coche</span>
+        <span id="val-scale">1.00</span>
+        <input type="range" id="rng-scale" min="0.50" max="1.80" step="0.01" value="1.00" />
+      </label>
 
-      const posZSlider = document.getElementById('pos-z-slider');
-      const posZInput = document.getElementById('pos-z-input');
-      const posZRead = document.getElementById('pos-z-read');
+      <label class="row">
+        <span>Altura sobre suelo</span>
+        <span id="val-lift">0.00</span>
+        <input type="range" id="rng-lift" min="-0.30" max="0.50" step="0.01" value="0.00" />
+      </label>
 
-      const scaleSlider = document.getElementById('scale-slider');
-      const scaleInput = document.getElementById('scale-input');
+      <button type="button" class="action" id="btn-reset-pose">Restablecer pose</button>
+    </div>
 
-      // Quick pose buttons
-      const btnGroundY0 = document.getElementById('btn-ground-y0');
-      const btnSideUpright = document.getElementById('btn-side-upright');
-      const btnResetPose = document.getElementById('btn-reset-pose');
-      const btnSavePose = document.getElementById('btn-save-pose');
-      const btnRestoreSavedPose = document.getElementById('btn-restore-saved-pose');
+    <div class="group">
+      <div class="group-title">Captura y nombres de archivo</div>
 
-      // 23 WebP + auto.json controls
-      const webpCodecBadgeEl = document.getElementById('webp-codec-badge');
-      const btnCaptureSingleWebp = document.getElementById('btn-capture-single-webp');
-      const btnGenerate23Webp = document.getElementById('btn-generate-23-webp');
-      const btnDownloadAutoJson = document.getElementById('btn-download-auto-json');
-      const btnDownloadAllWebp = document.getElementById('btn-download-all-webp');
-      const quickCaptureWebp = document.getElementById('quick-capture-webp');
-      const quick23WebpJson = document.getElementById('quick-23-webp-json');
-      const webpProgressBarEl = document.getElementById('webp-progress-bar');
-      const captureProgressLabel = document.getElementById('capture-progress-label');
+      <label class="check">
+        <input type="checkbox" id="chk-transparent" checked />
+        <span>Fondo transparente en capturas</span>
+      </label>
 
-      const autoJsonPreviewEl = document.getElementById('auto-json-preview');
-      const btnCopyAutoJson = document.getElementById('btn-copy-auto-json');
-      const capturesGalleryEl = document.getElementById('captures-gallery');
-      const galleryCountEl = document.getElementById('gallery-count');
-      const btnDownloadAllGallery = document.getElementById('btn-download-all-gallery');
-      const btnClearCaptures = document.getElementById('btn-clear-captures');
+      <label class="check">
+        <input type="checkbox" id="chk-hide-grid" checked />
+        <span>Ocultar cuadricula al capturar</span>
+      </label>
 
-      // Studio & quick camera buttons
-      const paintSwatches = Array.from(document.querySelectorAll('.paint-swatch'));
-      const paintActiveNameEl = document.getElementById('paint-active-name');
-      const studioLightSlider = document.getElementById('studio-light-slider');
-      const studioLightValEl = document.getElementById('studio-light-val');
-      const btnToggleGrid = document.getElementById('btn-toggle-grid');
-      const btnToggleBg = document.getElementById('btn-toggle-bg');
-      const infoSourceEl = document.getElementById('info-source');
-      const infoGeometryEl = document.getElementById('info-geometry');
-      const infoMinYEl = document.getElementById('info-miny');
+      <label class="row">
+        <span>Resolucion (px)</span>
+        <select id="sel-size">
+          <option value="256">256 x 256</option>
+          <option value="384">384 x 384</option>
+          <option value="512" selected>512 x 512</option>
+          <option value="768">768 x 768</option>
+        </select>
+      </label>
 
-      const quickResetCam = document.getElementById('quick-reset-cam');
-      const quickFrontCam = document.getElementById('quick-front-cam');
-      const quickSideCam = document.getElementById('quick-side-cam');
-      const quickTopCam = document.getElementById('quick-top-cam');
+      <div class="btn-grid-3">
+        <button type="button" class="action" id="preset-24-num">24 (00..23)</button>
+        <button type="button" class="action" id="preset-23-num">23 (00..22)</button>
+        <button type="button" class="action" id="preset-23-auto">23 (auto_01..23)</button>
+      </div>
 
-      const embedModalEl = document.getElementById('embed-modal');
-      const btnCloseEmbed = document.getElementById('btn-close-embed');
-      const btnCopySnippet = document.getElementById('btn-copy-snippet');
-      const embedSnippetArea = document.getElementById('embed-snippet-area');
+      <label class="row">
+        <span>Cantidad / Prefijo</span>
+        <div>
+          <input type="number" id="num-count" min="1" max="120" value="24" />
+          <input type="text" id="txt-prefix" value="" placeholder="ej: auto_ o vacio" />
+        </div>
+      </label>
 
-      // Manual pose state (never forced back to auto-orient once user edits)
-      const poseState = {
-        rx: 0,
-        ry: 0,
-        rz: 0,
-        px: 0,
-        py: 0,
-        pz: 0,
-        scale: 1.0
-      };
+      <label class="row">
+        <span>Indice inicial / Digitos</span>
+        <div>
+          <input type="number" id="num-start" min="0" max="999" value="0" />
+          <input type="number" id="num-pad" min="1" max="4" value="2" />
+        </div>
+      </label>
 
-      let savedCustomPose = null;
-      let sideToggleState = false;
-      let dragInteractionMode = 'camera'; // 'camera' | 'model'
-      let isGeneratingPack = false;
-      let useFallback2D = false;
-      let lightBgMode = false;
-      let nativeWebpSupported = true;
-      let activeSourceName = 'Polo MK4 3P (Integrado)';
-      let latestAutoJsonText = '';
-      let latestBatchItems = [];
+      <div class="btn-grid">
+        <button type="button" class="action primary" id="btn-export-frames">Generar WebP</button>
+        <button type="button" class="action success" id="btn-export-json">Descargar auto.json</button>
+      </div>
 
-      // Camera spherical state
-      const camOrbit = {
-        target: new THREE.Vector3(0, 0.72, 0),
-        spherical: new THREE.Spherical(6.2, Math.PI * 0.36, Math.PI * 0.24),
-        minRadius: 1.8,
-        maxRadius: 18.0,
-        minPhi: 0.06,
-        maxPhi: Math.PI - 0.06
-      };
+      <div class="status-line" id="status-line">Listo.</div>
+      <div class="mono" id="json-preview"></div>
+    </div>
+  </aside>
 
-      const pointerDrag = {
-        active: false,
-        action: 'orbit',
-        lastX: 0,
-        lastY: 0,
-        pinchDist: 0,
-        pinchRadius: 6.2
-      };
-
-      // Three.js references
-      let renderer = null;
-      let scene = null;
-      let camera = null;
-      let modelPivot = null;
-      let builtInModel = null;
-      let importedModel = null;
-      let gridHelper = null;
-
-      let ambientLight = null;
-      let keyLight = null;
-      let fillLight = null;
-      let rimLight = null;
-      let underLight = null;
-
-      const mats = {
-        bodyPaint: null,
-        glass: null,
-        trimDark: null,
-        tire: null,
-        rimSilver: null,
-        chrome: null,
-        headlight: null,
-        taillightRed: null,
-        taillightAmber: null,
-        underbody: null
-      };
-
-      // Stored captures: { id, label, filename, dataUrl, isWebp, shotIndex }
-      const sessionCaptures = [];
-
-      // =========================================================================
-      // 2. TOAST & EMBED HELPERS
-      // =========================================================================
-      let toastTimer = null;
-      function showToast(msg) {
-        toastEl.textContent = msg;
-        toastEl.classList.add('show');
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => {
-          toastEl.classList.remove('show');
-        }, 2500);
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
       }
-
-      function clampDeg(val) {
-        const n = parseFloat(val);
-        if (!Number.isFinite(n)) return 0;
-        if (n > 180) return ((n + 180) % 360 + 360) % 360 - 180;
-        if (n < -180) return ((n + 180) % 360 + 360) % 360 - 180;
-        return Math.round(n * 100) / 100;
-      }
-
-      function detectNativeWebpSupport() {
-        try {
-          const testCanvas = document.createElement('canvas');
-          testCanvas.width = 4;
-          testCanvas.height = 4;
-          const ctx = testCanvas.getContext('2d');
-          if (ctx) {
-            ctx.fillStyle = '#2563eb';
-            ctx.fillRect(0, 0, 4, 4);
-          }
-          const url = testCanvas.toDataURL('image/webp', 0.9);
-          nativeWebpSupported = typeof url === 'string' && url.startsWith('data:image/webp');
-        } catch (err) {
-          nativeWebpSupported = false;
-        }
-        webpCodecBadgeEl.textContent = nativeWebpSupported
-          ? 'WebP nativo activo'
-          : 'PNG → WebP fallback';
-      }
-
-      function buildEmbedSnippet() {
-        const srcUrl = (window.location && window.location.href && window.location.href.startsWith('http'))
-          ? window.location.href
-          : 'https://example.com/vw-polo-mk4-v12.html';
-        return [
-          '<div style="width:100%;height:580px;max-width:100%;border-radius:14px;overflow:hidden;background:#090d16;">',
-          `  <iframe src="${srcUrl}" title="VW Polo MK4 3 Puertas Visor 3D v12"`,
-          '    style="width:100%;height:100%;border:0;display:block;"',
-          '    allow="accelerometer; autoplay; encrypted-media; gyroscope; fullscreen" allowfullscreen></iframe>',
-          '</div>'
-        ].join('\n');
-      }
-
-      // =========================================================================
-      // 3. THREE.JS SCENE & MATERIALS (preserveDrawingBuffer: true)
-      // =========================================================================
-      function initMaterials() {
-        mats.bodyPaint = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#f1f5f9'),
-          metalness: 0.35,
-          roughness: 0.28
-        });
-
-        mats.glass = new THREE.MeshPhysicalMaterial({
-          color: new THREE.Color('#13242c'),
-          metalness: 0.05,
-          roughness: 0.08,
-          transparent: true,
-          opacity: 0.78
-        });
-
-        mats.trimDark = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#1e242d'),
-          metalness: 0.15,
-          roughness: 0.72
-        });
-
-        mats.tire = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#17191e'),
-          metalness: 0.05,
-          roughness: 0.85
-        });
-
-        mats.rimSilver = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#cbd5e1'),
-          metalness: 0.78,
-          roughness: 0.25
-        });
-
-        mats.chrome = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#e2e8f0'),
-          metalness: 0.9,
-          roughness: 0.16
-        });
-
-        mats.headlight = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#e2f1ff'),
-          emissive: new THREE.Color('#38bdf8'),
-          emissiveIntensity: 0.18,
-          metalness: 0.2,
-          roughness: 0.15
-        });
-
-        mats.taillightRed = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#dc2626'),
-          emissive: new THREE.Color('#991b1b'),
-          emissiveIntensity: 0.22,
-          metalness: 0.15,
-          roughness: 0.25
-        });
-
-        mats.taillightAmber = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#f59e0b'),
-          emissive: new THREE.Color('#b45309'),
-          emissiveIntensity: 0.15,
-          metalness: 0.15,
-          roughness: 0.3
-        });
-
-        mats.underbody = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#27303f'),
-          metalness: 0.4,
-          roughness: 0.65
-        });
-      }
-
-      function initThree() {
-        if (typeof THREE === 'undefined' || !THREE.WebGLRenderer) {
-          useFallback2D = true;
-          return false;
-        }
-
-        try {
-          renderer = new THREE.WebGLRenderer({
-            canvas: canvasEl,
-            antialias: true,
-            alpha: true,
-            preserveDrawingBuffer: true,
-            powerPreference: 'default'
-          });
-        } catch (err) {
-          useFallback2D = true;
-          return false;
-        }
-
-        if (!renderer.getContext()) {
-          useFallback2D = true;
-          return false;
-        }
-
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.06;
-
-        scene = new THREE.Scene();
-
-        const w = Math.max(stageEl.clientWidth, 300);
-        const h = Math.max(stageEl.clientHeight, 300);
-        camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 120);
-        applyCameraSpherical();
-
-        initMaterials();
-
-        const scaleLight = parseFloat(studioLightSlider.value) || 1.25;
-        ambientLight = new THREE.AmbientLight(0xdbeafe, 0.55 * scaleLight);
-        scene.add(ambientLight);
-
-        keyLight = new THREE.DirectionalLight(0xffffff, 1.55 * scaleLight);
-        keyLight.position.set(5.5, 8.2, 6.0);
-        keyLight.castShadow = true;
-        keyLight.shadow.mapSize.width = 1024;
-        keyLight.shadow.mapSize.height = 1024;
-        keyLight.shadow.camera.near = 1;
-        keyLight.shadow.camera.far = 28;
-        const b = 4.5;
-        keyLight.shadow.camera.left = -b;
-        keyLight.shadow.camera.right = b;
-        keyLight.shadow.camera.top = b;
-        keyLight.shadow.camera.bottom = -b;
-        keyLight.shadow.bias = -0.0005;
-        scene.add(keyLight);
-
-        fillLight = new THREE.DirectionalLight(0x93c5fd, 0.78 * scaleLight);
-        fillLight.position.set(-6.0, 4.2, -3.5);
-        scene.add(fillLight);
-
-        rimLight = new THREE.DirectionalLight(0xe0f2fe, 0.85 * scaleLight);
-        rimLight.position.set(0.0, 5.0, -7.0);
-        scene.add(rimLight);
-
-        underLight = new THREE.DirectionalLight(0x64748b, 0.5 * scaleLight);
-        underLight.position.set(0.0, -5.0, 2.5);
-        scene.add(underLight);
-
-        gridHelper = new THREE.GridHelper(18, 24, 0x3b82f6, 0x1e293b);
-        gridHelper.position.y = 0;
-        if (Array.isArray(gridHelper.material)) {
-          gridHelper.material.forEach((m) => {
-            m.transparent = true;
-            m.opacity = 0.42;
-          });
-        } else if (gridHelper.material) {
-          gridHelper.material.transparent = true;
-          gridHelper.material.opacity = 0.42;
-        }
-        scene.add(gridHelper);
-
-        const shadowFloor = new THREE.Mesh(
-          new THREE.PlaneGeometry(18, 18),
-          new THREE.ShadowMaterial({ opacity: 0.28 })
-        );
-        shadowFloor.rotation.x = -Math.PI / 2;
-        shadowFloor.position.y = 0.001;
-        shadowFloor.receiveShadow = true;
-        scene.add(shadowFloor);
-
-        modelPivot = new THREE.Group();
-        modelPivot.name = 'VW_Polo_MK4_Manual_Pose_Pivot';
-        scene.add(modelPivot);
-
-        builtInModel = createPoloMK4ThreeDoor();
-        centerAndScaleInitial(builtInModel, 4.0);
-        modelPivot.add(builtInModel);
-
-        syncPoseControlsFromState();
-        applyPoseToPivot();
-        updateGeometryStats(builtInModel, 'Polo MK4 3P (Integrado)');
-        resizeCanvas();
-        return true;
-      }
-
-      // =========================================================================
-      // 4. VW POLO MK4 3-DOOR (2001–2009) PROCEDURAL MODEL
-      // =========================================================================
-      function createPoloMK4ThreeDoor() {
-        const car = new THREE.Group();
-        car.name = 'Polo_MK4_3Door_Mesh_Group';
-
-        const wheelRadius = 0.33;
-        const wheelWidth = 0.21;
-        const wheelY = wheelRadius;
-        const frontZ = 1.24;
-        const rearZ = -1.24;
-        const trackHalfX = 0.72;
-
-        const chassis = new THREE.Mesh(
-          new THREE.BoxGeometry(1.42, 0.14, 3.15),
-          mats.underbody
-        );
-        chassis.position.set(0, 0.28, 0);
-        chassis.castShadow = true;
-        chassis.receiveShadow = true;
-        car.add(chassis);
-
-        const lowerBody = new THREE.Mesh(
-          new THREE.BoxGeometry(1.64, 0.44, 3.78),
-          mats.bodyPaint
-        );
-        lowerBody.position.set(0, 0.54, 0);
-        lowerBody.castShadow = true;
-        lowerBody.receiveShadow = true;
-        car.add(lowerBody);
-
-        const frontBumper = new THREE.Mesh(
-          new THREE.BoxGeometry(1.66, 0.34, 0.26),
-          mats.bodyPaint
-        );
-        frontBumper.position.set(0, 0.44, 1.86);
-        frontBumper.castShadow = true;
-        car.add(frontBumper);
-
-        const lowerGrille = new THREE.Mesh(
-          new THREE.BoxGeometry(0.92, 0.12, 0.06),
-          mats.trimDark
-        );
-        lowerGrille.position.set(0, 0.36, 1.99);
-        car.add(lowerGrille);
-
-        const rearBumper = new THREE.Mesh(
-          new THREE.BoxGeometry(1.66, 0.36, 0.24),
-          mats.bodyPaint
-        );
-        rearBumper.position.set(0, 0.46, -1.86);
-        rearBumper.castShadow = true;
-        car.add(rearBumper);
-
-        const beltBody = new THREE.Mesh(
-          new THREE.BoxGeometry(1.56, 0.26, 3.48),
-          mats.bodyPaint
-        );
-        beltBody.position.set(0, 0.86, -0.05);
-        beltBody.castShadow = true;
-        beltBody.receiveShadow = true;
-        car.add(beltBody);
-
-        [-1, 1].forEach((side) => {
-          const rubStrip = new THREE.Mesh(
-            new THREE.BoxGeometry(0.03, 0.06, 3.25),
-            mats.trimDark
-          );
-          rubStrip.position.set(side * 0.835, 0.62, -0.02);
-          car.add(rubStrip);
-
-          const doorHandle = new THREE.Mesh(
-            new THREE.BoxGeometry(0.035, 0.04, 0.14),
-            mats.trimDark
-          );
-          doorHandle.position.set(side * 0.795, 0.88, -0.18);
-          car.add(doorHandle);
-
-          const mirrorStalk = new THREE.Mesh(
-            new THREE.BoxGeometry(0.11, 0.04, 0.06),
-            mats.trimDark
-          );
-          mirrorStalk.position.set(side * 0.82, 0.99, 0.56);
-          car.add(mirrorStalk);
-
-          const mirrorCap = new THREE.Mesh(
-            new THREE.BoxGeometry(0.16, 0.11, 0.12),
-            mats.bodyPaint
-          );
-          mirrorCap.position.set(side * 0.91, 1.02, 0.54);
-          mirrorCap.castShadow = true;
-          car.add(mirrorCap);
-        });
-
-        const cabinCore = new THREE.Mesh(
-          new THREE.BoxGeometry(1.36, 0.44, 1.88),
-          mats.bodyPaint
-        );
-        cabinCore.position.set(0, 1.18, -0.22);
-        cabinCore.castShadow = true;
-        cabinCore.receiveShadow = true;
-        car.add(cabinCore);
-
-        const roofPanel = new THREE.Mesh(
-          new THREE.BoxGeometry(1.26, 0.06, 1.72),
-          mats.bodyPaint
-        );
-        roofPanel.position.set(0, 1.41, -0.26);
-        roofPanel.castShadow = true;
-        car.add(roofPanel);
-
-        const antennaBase = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.025, 0.035, 0.04, 12),
-          mats.trimDark
-        );
-        antennaBase.position.set(0, 1.45, -1.02);
-        car.add(antennaBase);
-
-        const antennaMast = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.005, 0.01, 0.34, 8),
-          mats.trimDark
-        );
-        antennaMast.position.set(0, 1.62, -1.05);
-        antennaMast.rotation.x = -0.18;
-        car.add(antennaMast);
-
-        const windshield = new THREE.Mesh(
-          new THREE.BoxGeometry(1.28, 0.03, 0.78),
-          mats.glass
-        );
-        windshield.position.set(0, 1.19, 0.88);
-        windshield.rotation.x = 0.56;
-        car.add(windshield);
-
-        const rearWindow = new THREE.Mesh(
-          new THREE.BoxGeometry(1.24, 0.03, 0.68),
-          mats.glass
-        );
-        rearWindow.position.set(0, 1.21, -1.24);
-        rearWindow.rotation.x = -0.52;
-        car.add(rearWindow);
-
-        [-1, 1].forEach((side) => {
-          const frontSideGlass = new THREE.Mesh(
-            new THREE.BoxGeometry(0.03, 0.32, 0.86),
-            mats.glass
-          );
-          frontSideGlass.position.set(side * 0.685, 1.16, 0.22);
-          car.add(frontSideGlass);
-
-          const bPillar = new THREE.Mesh(
-            new THREE.BoxGeometry(0.04, 0.34, 0.07),
-            mats.trimDark
-          );
-          bPillar.position.set(side * 0.69, 1.16, -0.24);
-          car.add(bPillar);
-
-          const quarterGlass = new THREE.Mesh(
-            new THREE.BoxGeometry(0.03, 0.30, 0.64),
-            mats.glass
-          );
-          quarterGlass.position.set(side * 0.685, 1.16, -0.64);
-          car.add(quarterGlass);
-        });
-
-        const frontGrille = new THREE.Mesh(
-          new THREE.BoxGeometry(0.68, 0.22, 0.05),
-          mats.trimDark
-        );
-        frontGrille.position.set(0, 0.76, 1.84);
-        car.add(frontGrille);
-
-        const vwBadge = new THREE.Mesh(
-          new THREE.TorusGeometry(0.075, 0.015, 10, 24),
-          mats.chrome
-        );
-        vwBadge.position.set(0, 0.77, 1.875);
-        car.add(vwBadge);
-
-        [-1, 1].forEach((side) => {
-          const lampHousing = new THREE.Mesh(
-            new THREE.BoxGeometry(0.32, 0.17, 0.14),
-            mats.headlight
-          );
-          lampHousing.position.set(side * 0.56, 0.75, 1.81);
-          lampHousing.rotation.y = side * 0.15;
-          car.add(lampHousing);
-
-          [-0.065, 0.065].forEach((offsetX) => {
-            const innerRing = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.05, 0.05, 0.03, 16),
-              mats.chrome
-            );
-            innerRing.rotation.x = Math.PI / 2;
-            innerRing.position.set(side * 0.56 + offsetX, 0.75, 1.88);
-            car.add(innerRing);
-          });
-
-          const tailRed = new THREE.Mesh(
-            new THREE.BoxGeometry(0.26, 0.22, 0.08),
-            mats.taillightRed
-          );
-          tailRed.position.set(side * 0.64, 0.84, -1.96);
-          car.add(tailRed);
-
-          const tailAmber = new THREE.Mesh(
-            new THREE.BoxGeometry(0.16, 0.07, 0.09),
-            mats.taillightAmber
-          );
-          tailAmber.position.set(side * 0.64, 0.76, -1.97);
-          car.add(tailAmber);
-        });
-
-        const wheelCoords = [
-          { x: -trackHalfX, z: frontZ, name: 'Rueda_DI' },
-          { x: trackHalfX, z: frontZ, name: 'Rueda_DD' },
-          { x: -trackHalfX, z: rearZ, name: 'Rueda_TI' },
-          { x: trackHalfX, z: rearZ, name: 'Rueda_TD' }
-        ];
-
-        wheelCoords.forEach((wc) => {
-          const wGroup = new THREE.Group();
-          wGroup.name = wc.name;
-          wGroup.position.set(wc.x, wheelY, wc.z);
-
-          const tire = new THREE.Mesh(
-            new THREE.CylinderGeometry(wheelRadius, wheelRadius, wheelWidth, 28),
-            mats.tire
-          );
-          tire.rotation.z = Math.PI / 2;
-          tire.castShadow = true;
-          tire.receiveShadow = true;
-          wGroup.add(tire);
-
-          const rim = new THREE.Mesh(
-            new THREE.CylinderGeometry(wheelRadius * 0.64, wheelRadius * 0.64, wheelWidth + 0.015, 20),
-            mats.rimSilver
-          );
-          rim.rotation.z = Math.PI / 2;
-          wGroup.add(rim);
-
-          for (let i = 0; i < 5; i++) {
-            const spoke = new THREE.Mesh(
-              new THREE.BoxGeometry(wheelWidth + 0.024, 0.032, wheelRadius * 0.48),
-              mats.rimSilver
-            );
-            spoke.rotation.x = (i * Math.PI * 2) / 5;
-            wGroup.add(spoke);
-          }
-
-          car.add(wGroup);
-        });
-
-        return car;
-      }
-
-      // =========================================================================
-      // 5. POSE MANAGEMENT (NON-DESTRUCTIVE, RESPECTS USER ROTATIONS)
-      // =========================================================================
-      function centerAndScaleInitial(childObj, targetSpan = 4.0) {
-        if (!childObj) return;
-        childObj.position.set(0, 0, 0);
-        childObj.rotation.set(0, 0, 0);
-        childObj.scale.set(1, 1, 1);
-        childObj.updateMatrixWorld(true);
-
-        const box = new THREE.Box3().setFromObject(childObj);
-        const size = new THREE.Vector3();
-        const center = new THREE.Vector3();
-        box.getSize(size);
-        box.getCenter(center);
-
-        const largest = Math.max(size.x, size.y, size.z) || 1;
-        const s = targetSpan / largest;
-
-        childObj.scale.setScalar(s);
-        childObj.position.set(-center.x * s, -center.y * s, -center.z * s);
-        childObj.updateMatrixWorld(true);
-
-        childObj.traverse((node) => {
-          if (node.isMesh) {
-            node.castShadow = true;
-            node.receiveShadow = true;
-          }
-        });
-      }
-
-      function syncPoseControlsFromState() {
-        rotXSlider.value = poseState.rx;
-        rotXNum.value = poseState.rx;
-        rotYSlider.value = poseState.ry;
-        rotYNum.value = poseState.ry;
-        rotZSlider.value = poseState.rz;
-        rotZNum.value = poseState.rz;
-
-        posXSlider.value = poseState.px;
-        posXInput.value = poseState.px.toFixed(2);
-        posXRead.textContent = poseState.px.toFixed(2);
-
-        posYSlider.value = poseState.py;
-        posYInput.value = poseState.py.toFixed(2);
-        posYRead.textContent = poseState.py.toFixed(2);
-
-        posZSlider.value = poseState.pz;
-        posZInput.value = poseState.pz.toFixed(2);
-        posZRead.textContent = poseState.pz.toFixed(2);
-
-        scaleSlider.value = poseState.scale;
-        scaleInput.value = poseState.scale.toFixed(2);
-      }
-
-      function applyPoseToPivot() {
-        if (!modelPivot) {
-          refreshMinYReadout();
-          return;
-        }
-        modelPivot.rotation.order = 'YXZ';
-        modelPivot.rotation.set(
-          THREE.MathUtils.degToRad(poseState.rx),
-          THREE.MathUtils.degToRad(poseState.ry),
-          THREE.MathUtils.degToRad(poseState.rz)
-        );
-        modelPivot.position.set(poseState.px, poseState.py, poseState.pz);
-        modelPivot.scale.setScalar(poseState.scale);
-        modelPivot.updateMatrixWorld(true);
-
-        statusTextEl.textContent =
-          `Pose: X ${poseState.rx.toFixed(0)}° • Y ${poseState.ry.toFixed(0)}° • Z ${poseState.rz.toFixed(0)}° | Esc ${poseState.scale.toFixed(2)}×`;
-        refreshMinYReadout();
-      }
-
-      function refreshMinYReadout() {
-        if (!modelPivot) {
-          infoMinYEl.textContent = `Y = ${poseState.py.toFixed(2)}m`;
-          return;
-        }
-        modelPivot.updateMatrixWorld(true);
-        const box = new THREE.Box3().setFromObject(modelPivot);
-        const minY = Number.isFinite(box.min.y) ? box.min.y : 0;
-        infoMinYEl.textContent = `Y = ${minY.toFixed(2)}m`;
-      }
-
-      function updateGeometryStats(targetObj, sourceLabel) {
-        activeSourceName = sourceLabel;
-        infoSourceEl.textContent = sourceLabel;
-        if (!targetObj) {
-          infoGeometryEl.textContent = 'Modo 2D';
-          return;
-        }
-        let meshes = 0;
-        let tris = 0;
-        targetObj.traverse((node) => {
-          if (node.isMesh && node.geometry) {
-            meshes += 1;
-            const g = node.geometry;
-            if (g.index) {
-              tris += Math.floor(g.index.count / 3);
-            } else if (g.attributes && g.attributes.position) {
-              tris += Math.floor(g.attributes.position.count / 3);
-            }
-          }
-        });
-        infoGeometryEl.textContent = `${meshes} mallas • ${tris.toLocaleString('es-ES')} triángulos`;
-        refreshMinYReadout();
-      }
-
-      // Quick Pose Actions
-      function groundModelToY0() {
-        if (!modelPivot) {
-          poseState.py = 0;
-          syncPoseControlsFromState();
-          refreshMinYReadout();
-          showToast('Posición Y ajustada a 0.00m');
-          return;
-        }
-        applyPoseToPivot();
-        const box = new THREE.Box3().setFromObject(modelPivot);
-        if (Number.isFinite(box.min.y)) {
-          poseState.py = Math.round((poseState.py - box.min.y) * 100) / 100;
-        } else {
-          poseState.py = 0;
-        }
-        syncPoseControlsFromState();
-        applyPoseToPivot();
-        showToast('Modelo apoyado en el suelo (Y = 0)');
-      }
-
-      function toggleSideOrVerticalPose() {
-        sideToggleState = !sideToggleState;
-        poseState.rx = 0;
-        poseState.rz = sideToggleState ? 90 : 0;
-        syncPoseControlsFromState();
-        applyPoseToPivot();
-        showToast(sideToggleState ? 'Pose lateral/vertical (Z = 90°)' : 'Pose horizontal (Z = 0°)');
-      }
-
-      function resetPoseToZero() {
-        poseState.rx = 0;
-        poseState.ry = 0;
-        poseState.rz = 0;
-        poseState.px = 0;
-        poseState.py = 0;
-        poseState.pz = 0;
-        poseState.scale = 1.0;
-        sideToggleState = false;
-        syncPoseControlsFromState();
-        applyPoseToPivot();
-        showToast('Pose reseteada (0°, 0°, 0°)');
-      }
-
-      function saveCustomPose() {
-        savedCustomPose = { ...poseState };
-        btnRestoreSavedPose.disabled = false;
-        showToast('Pose personalizada guardada');
-      }
-
-      function restoreSavedPose() {
-        if (!savedCustomPose) return;
-        Object.assign(poseState, savedCustomPose);
-        syncPoseControlsFromState();
-        applyPoseToPivot();
-        showToast('Pose personalizada restaurada');
-      }
-
-      // =========================================================================
-      // 6. MODEL LOADING (.GLB / .GLTF) WITHOUT OVERWRITING MANUAL POSE
-      // =========================================================================
-      function switchToBuiltinCar() {
-        if (!modelPivot) {
-          updateGeometryStats(null, 'Polo MK4 3P (2D)');
-          showToast('Vista 2D del Polo MK4 activa');
-          return;
-        }
-        if (importedModel && modelPivot.children.includes(importedModel)) {
-          modelPivot.remove(importedModel);
-          importedModel = null;
-        }
-        if (!builtInModel) {
-          builtInModel = createPoloMK4ThreeDoor();
-        }
-        centerAndScaleInitial(builtInModel, 4.0);
-        if (!modelPivot.children.includes(builtInModel)) {
-          modelPivot.add(builtInModel);
-        }
-        applyPoseToPivot();
-        updateGeometryStats(builtInModel, 'Polo MK4 3P (Integrado)');
-        showToast('Modelo integrado cargado (pose conservada)');
-      }
-
-      function handleModelFile(file) {
-        if (!file) return;
-        if (useFallback2D || typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') {
-          showToast('Cargar GLB/GLTF requiere contexto WebGL activo');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onerror = () => showToast('No se pudo leer el archivo');
-        reader.onload = (ev) => {
-          const buffer = ev.target.result;
-          const loader = new THREE.GLTFLoader();
-          try {
-            loader.parse(
-              buffer,
-              '',
-              (gltf) => {
-                const loadedRoot = gltf.scene || (gltf.scenes && gltf.scenes[0]);
-                if (!loadedRoot) {
-                  showToast('El archivo no contiene una escena 3D válida');
-                  return;
-                }
-
-                if (builtInModel && modelPivot.children.includes(builtInModel)) {
-                  modelPivot.remove(builtInModel);
-                }
-                if (importedModel && modelPivot.children.includes(importedModel)) {
-                  modelPivot.remove(importedModel);
-                }
-
-                importedModel = loadedRoot;
-                importedModel.name = 'Imported_GLTF_Car';
-                centerAndScaleInitial(importedModel, 4.0);
-                modelPivot.add(importedModel);
-
-                applyPoseToPivot();
-                updateGeometryStats(importedModel, file.name);
-                showToast(`Cargado ${file.name} — conservando tu pose`);
-              },
-              () => showToast('Error al interpretar el archivo .glb/.gltf')
-            );
-          } catch (err) {
-            showToast('Error al cargar el modelo 3D');
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      }
-
-      // =========================================================================
-      // 7. WEBP CONVERSION, 23-SHOT DEFINITION & auto.json GENERATOR
-      // =========================================================================
-      function applyCameraSpherical() {
-        if (!camera) return;
-        camOrbit.spherical.radius = THREE.MathUtils.clamp(
-          camOrbit.spherical.radius,
-          camOrbit.minRadius,
-          camOrbit.maxRadius
-        );
-        camOrbit.spherical.phi = THREE.MathUtils.clamp(
-          camOrbit.spherical.phi,
-          camOrbit.minPhi,
-          camOrbit.maxPhi
-        );
-        const offset = new THREE.Vector3().setFromSpherical(camOrbit.spherical);
-        camera.position.copy(camOrbit.target).add(offset);
-        camera.lookAt(camOrbit.target);
-      }
-
-      function getCurrentModelWorldCenter() {
-        if (!modelPivot) return new THREE.Vector3(0, 0.72, 0);
-        modelPivot.updateMatrixWorld(true);
-        const box = new THREE.Box3().setFromObject(modelPivot);
-        const center = new THREE.Vector3();
-        if (!box.isEmpty()) {
-          box.getCenter(center);
-          return center;
-        }
-        return modelPivot.position.clone();
-      }
-
-      function renderImmediateFrame() {
-        if (useFallback2D) {
-          drawFallback2D();
-          return;
-        }
-        if (renderer && scene && camera) {
-          renderer.render(scene, camera);
-        }
-      }
-
-      /**
-       * Converts the rendered canvas into a WebP data URL (with an automatic
-       * PNG-to-WebP 2D canvas fallback if direct toDataURL('image/webp') is not
-       * produced by the browser/sandbox).
-       */
-      function canvasToWebpDataUrl(sourceCanvas, quality = 0.9) {
-        try {
-          const directUrl = sourceCanvas.toDataURL('image/webp', quality);
-          if (typeof directUrl === 'string' && directUrl.startsWith('data:image/webp')) {
-            return directUrl;
-          }
-        } catch (err) {
-          // Proceed to PNG -> 2D canvas -> WebP fallback
-        }
-
-        try {
-          const pngUrl = sourceCanvas.toDataURL('image/png');
-          const offscreen = document.createElement('canvas');
-          offscreen.width = sourceCanvas.width || 640;
-          offscreen.height = sourceCanvas.height || 360;
-          const ctx = offscreen.getContext('2d');
-          if (!ctx) return pngUrl;
-
-          const tempImg = new Image();
-          tempImg.src = pngUrl;
-          // Draw synchronously if already decoded, otherwise fallback to pngUrl
-          if (tempImg.complete && tempImg.naturalWidth > 0) {
-            ctx.drawImage(tempImg, 0, 0, offscreen.width, offscreen.height);
-            const converted = offscreen.toDataURL('image/webp', quality);
-            if (typeof converted === 'string' && converted.startsWith('data:image/webp')) {
-              return converted;
-            }
-          }
-          return pngUrl;
-        } catch (err) {
-          return sourceCanvas.toDataURL('image/png');
-        }
-      }
-
-      function triggerFileDownload(dataUrlOrText, filename, isJsonText = false) {
-        const link = document.createElement('a');
-        if (isJsonText) {
-          const blob = new Blob([dataUrlOrText], { type: 'application/json;charset=utf-8' });
-          link.href = URL.createObjectURL(blob);
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          setTimeout(() => URL.revokeObjectURL(link.href), 1500);
-          return;
-        }
-
-        link.href = dataUrlOrText;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-
-      /**
-       * Builds the 23 pose-relative camera viewpoints (18 turntable ring angles
-       * around the posed car + 5 elevated/3-4/top/low pose angles = 23 total).
-       */
-      function build23PoseAngles(baseYawRad) {
-        const angles = [];
-
-        // 18 turntable ring views every 20° around the posed model's Y axis
-        for (let i = 0; i < 18; i++) {
-          const deg = i * 20;
-          const rad = THREE.MathUtils.degToRad(deg);
-          angles.push({
-            index: i + 1,
-            file: `auto_${String(i + 1).padStart(2, '0')}.webp`,
-            name: `Giro ${deg}°`,
-            category: 'ring_360',
-            yawRelDeg: deg,
-            yaw: baseYawRad + rad,
-            phi: Math.PI * 0.41,
-            radiusScale: 1.0
-          });
-        }
-
-        // 5 specialized elevation & 3/4 inspection angles (shots 19..23)
-        const extraShots = [
-          { name: '3/4 Frontal Alto', category: 'elevated_34', yawRelDeg: 35, phi: 0.62, radiusScale: 1.05 },
-          { name: '3/4 Trasero Alto', category: 'elevated_34', yawRelDeg: 145, phi: 0.62, radiusScale: 1.05 },
-          { name: 'Cenital / Techo', category: 'top_down', yawRelDeg: 0, phi: 0.16, radiusScale: 1.12 },
-          { name: '3/4 Bajo Deportivo', category: 'low_angle', yawRelDeg: -38, phi: 1.52, radiusScale: 1.02 },
-          { name: '3/4 Trasero Bajo', category: 'low_angle', yawRelDeg: -142, phi: 1.50, radiusScale: 1.02 }
-        ];
-
-        extraShots.forEach((ex, idx) => {
-          const num = 19 + idx;
-          angles.push({
-            index: num,
-            file: `auto_${String(num).padStart(2, '0')}.webp`,
-            name: ex.name,
-            category: ex.category,
-            yawRelDeg: ex.yawRelDeg,
-            yaw: baseYawRad + THREE.MathUtils.degToRad(ex.yawRelDeg),
-            phi: ex.phi,
-            radiusScale: ex.radiusScale
-          });
-        });
-
-        return angles;
-      }
-
-      function renderGalleryUI() {
-        galleryCountEl.textContent = String(sessionCaptures.length);
-        const hasCaptures = sessionCaptures.length > 0;
-        btnDownloadAllWebp.disabled = !hasCaptures;
-        btnDownloadAllGallery.disabled = !hasCaptures;
-        btnClearCaptures.disabled = !hasCaptures;
-
-        if (!hasCaptures) {
-          capturesGalleryEl.innerHTML =
-            '<div class="col-span-2 text-center py-4 text-[11px] text-slate-400 rounded-lg bg-slate-900/50 border border-slate-800/80">' +
-            'Aún no hay capturas. Pulsa "Generar 23 WebP + auto.json según mi pose".' +
-            '</div>';
-          return;
-        }
-
-        capturesGalleryEl.innerHTML = '';
-        sessionCaptures.forEach((cap) => {
-          const card = document.createElement('div');
-          card.className = 'capture-thumb-card p-1.5 space-y-1';
-
-          const img = document.createElement('img');
-          img.src = cap.dataUrl;
-          img.alt = cap.filename;
-
-          const title = document.createElement('div');
-          title.className = 'text-[10px] font-medium text-slate-200 truncate';
-          title.textContent = `${cap.filename} • ${cap.label}`;
-
-          const dlBtn = document.createElement('button');
-          dlBtn.type = 'button';
-          dlBtn.className = 'ui-btn w-full !min-h-0 !py-1 text-[10px]';
-          dlBtn.textContent = '⬇️ WebP';
-          dlBtn.addEventListener('click', () => {
-            triggerFileDownload(cap.dataUrl, cap.filename, false);
-          });
-
-          card.appendChild(img);
-          card.appendChild(title);
-          card.appendChild(dlBtn);
-          capturesGalleryEl.appendChild(card);
-        });
-      }
-
-      function captureSingleWebpView() {
-        renderImmediateFrame();
-        const webpUrl = canvasToWebpDataUrl(canvasEl, 0.92);
-        const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        const filename = `polo_mk4_pose_X${Math.round(poseState.rx)}_Y${Math.round(poseState.ry)}_Z${Math.round(poseState.rz)}_${stamp}.webp`;
-        const label = `Pose (${Math.round(poseState.rx)}°, ${Math.round(poseState.ry)}°, ${Math.round(poseState.rz)}°)`;
-
-        const entry = {
-          id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-          label,
-          filename,
-          dataUrl: webpUrl,
-          isWebp: webpUrl.startsWith('data:image/webp'),
-          shotIndex: null
-        };
-
-        sessionCaptures.unshift(entry);
-        renderGalleryUI();
-        triggerFileDownload(webpUrl, filename, false);
-        showToast(`Captura guardada: ${filename}`);
-      }
-
-      /**
-       * Generates all 23 WebP images (`auto_01.webp` .. `auto_23.webp`) based on
-       * the model's current pose, builds `auto.json`, updates UI preview & gallery,
-       * and triggers downloads of the 23 WebP files plus `auto.json`.
-       */
-      function generate23WebpAndAutoJson() {
-        if (isGeneratingPack) return;
-        isGeneratingPack = true;
-
-        btnGenerate23Webp.disabled = true;
-        quick23WebpJson.disabled = true;
-        webpProgressBarEl.style.width = '0%';
-
-        const savedTarget = camOrbit.target.clone();
-        const savedSpherical = camOrbit.spherical.clone();
-
-        applyPoseToPivot();
-        const modelCenter = getCurrentModelWorldCenter();
-
-        let baseRadius = 5.6;
-        if (modelPivot) {
-          const box = new THREE.Box3().setFromObject(modelPivot);
-          const sphere = new THREE.Sphere();
-          box.getBoundingSphere(sphere);
-          if (Number.isFinite(sphere.radius) && sphere.radius > 0.2) {
-            baseRadius = THREE.MathUtils.clamp(sphere.radius * 2.5, 3.6, 12.5);
-          }
-        }
-
-        const baseYawRad = THREE.MathUtils.degToRad(poseState.ry);
-        const shots = build23PoseAngles(baseYawRad);
-        const generatedItems = [];
-
-        camOrbit.target.copy(modelCenter);
-
-        let idx = 0;
-        function processNextShot() {
-          if (idx >= shots.length) {
-            // Restore original camera orbit cleanly
-            camOrbit.target.copy(savedTarget);
-            camOrbit.spherical.copy(savedSpherical);
-            applyCameraSpherical();
-            renderImmediateFrame();
-
-            // Build auto.json manifest reflecting exact user pose + 23 WebP files
-            const manifestObj = {
-              schema: 'vw_polo_mk4_auto_manifest_v12',
-              generatedAt: new Date().toISOString(),
-              modelSource: activeSourceName,
-              totalImages: generatedItems.length,
-              format: 'image/webp',
-              pose: {
-                rotationDeg: {
-                  x: poseState.rx,
-                  y: poseState.ry,
-                  z: poseState.rz
-                },
-                positionMeters: {
-                  x: poseState.px,
-                  y: poseState.py,
-                  z: poseState.pz
-                },
-                scale: poseState.scale,
-                worldCenter: {
-                  x: Math.round(modelCenter.x * 1000) / 1000,
-                  y: Math.round(modelCenter.y * 1000) / 1000,
-                  z: Math.round(modelCenter.z * 1000) / 1000
-                }
-              },
-              frames: generatedItems.map((it) => ({
-                index: it.index,
-                file: it.file,
-                label: it.name,
-                category: it.category,
-                relativeYawDeg: it.yawRelDeg,
-                cameraElevationDeg: Math.round(THREE.MathUtils.radToDeg(Math.PI * 0.5 - it.phi) * 10) / 10,
-                cameraDistance: Math.round(it.distance * 1000) / 1000
-              }))
-            };
-
-            latestAutoJsonText = JSON.stringify(manifestObj, null, 2);
-            latestBatchItems = generatedItems.slice();
-
-            autoJsonPreviewEl.value = latestAutoJsonText;
-            btnDownloadAutoJson.disabled = false;
-            btnCopyAutoJson.disabled = false;
-
-            // Prepend the 23 new captures to gallery
-            for (let k = generatedItems.length - 1; k >= 0; k--) {
-              const g = generatedItems[k];
-              sessionCaptures.unshift({
-                id: `auto23_${g.index}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                label: g.name,
-                filename: g.file,
-                dataUrl: g.dataUrl,
-                isWebp: g.dataUrl.startsWith('data:image/webp'),
-                shotIndex: g.index
-              });
-            }
-            renderGalleryUI();
-
-            // Download auto.json
-            triggerFileDownload(latestAutoJsonText, 'auto.json', true);
-
-            isGeneratingPack = false;
-            btnGenerate23Webp.disabled = false;
-            quick23WebpJson.disabled = false;
-            webpProgressBarEl.style.width = '100%';
-            captureProgressLabel.textContent =
-              `Completado: 23 WebP (auto_01.webp – auto_23.webp) + auto.json descargados.`;
-            studioPanelEl.classList.add('open');
-            btnOpenStudio.classList.add('active');
-            showToast('23 WebP + auto.json generados según tu pose');
-            return;
-          }
-
-          const shot = shots[idx];
-          const shotDist = baseRadius * shot.radiusScale;
-          camOrbit.spherical.radius = shotDist;
-          camOrbit.spherical.phi = shot.phi;
-          camOrbit.spherical.theta = shot.yaw;
-          applyCameraSpherical();
-          renderImmediateFrame();
-
-          const webpUrl = canvasToWebpDataUrl(canvasEl, 0.9);
-          generatedItems.push({
-            index: shot.index,
-            file: shot.file,
-            name: shot.name,
-            category: shot.category,
-            yawRelDeg: shot.yawRelDeg,
-            phi: shot.phi,
-            distance: shotDist,
-            dataUrl: webpUrl
-          });
-
-          // Trigger WebP download
-          triggerFileDownload(webpUrl, shot.file, false);
-
-          const pct = Math.round(((idx + 1) / shots.length) * 100);
-          webpProgressBarEl.style.width = `${pct}%`;
-          captureProgressLabel.textContent =
-            `Generando ${idx + 1}/${shots.length}: ${shot.file} (${shot.name})...`;
-
-          idx += 1;
-          setTimeout(processNextShot, 75);
-        }
-
-        processNextShot();
-      }
-
-      // =========================================================================
-      // 8. INTERACTION LISTENERS (POSE INPUTS, DRAG MODES, CAMERA, GALLERY)
-      // =========================================================================
-      function bindPoseControls() {
-        function bindRotPair(slider, numInput, key) {
-          slider.addEventListener('input', () => {
-            poseState[key] = clampDeg(slider.value);
-            numInput.value = poseState[key];
-            applyPoseToPivot();
-          });
-          numInput.addEventListener('change', () => {
-            poseState[key] = clampDeg(numInput.value);
-            slider.value = poseState[key];
-            numInput.value = poseState[key];
-            applyPoseToPivot();
-          });
-        }
-
-        bindRotPair(rotXSlider, rotXNum, 'rx');
-        bindRotPair(rotYSlider, rotYNum, 'ry');
-        bindRotPair(rotZSlider, rotZNum, 'rz');
-
-        document.querySelectorAll('.step-btn').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const axis = btn.dataset.axis;
-            const delta = parseFloat(btn.dataset.delta) || 0;
-            poseState[axis] = clampDeg((poseState[axis] || 0) + delta);
-            syncPoseControlsFromState();
-            applyPoseToPivot();
-          });
-        });
-
-        function bindPosPair(slider, numInput, readSpan, key, minV, maxV) {
-          slider.addEventListener('input', () => {
-            const v = THREE.MathUtils.clamp(parseFloat(slider.value) || 0, minV, maxV);
-            poseState[key] = Math.round(v * 100) / 100;
-            numInput.value = poseState[key].toFixed(2);
-            readSpan.textContent = poseState[key].toFixed(2);
-            applyPoseToPivot();
-          });
-          numInput.addEventListener('change', () => {
-            const raw = parseFloat(numInput.value);
-            const v = Number.isFinite(raw) ? THREE.MathUtils.clamp(raw, minV, maxV) : 0;
-            poseState[key] = Math.round(v * 100) / 100;
-            slider.value = poseState[key];
-            numInput.value = poseState[key].toFixed(2);
-            readSpan.textContent = poseState[key].toFixed(2);
-            applyPoseToPivot();
-          });
-        }
-
-        bindPosPair(posXSlider, posXInput, posXRead, 'px', -5, 5);
-        bindPosPair(posYSlider, posYInput, posYRead, 'py', -2.5, 4);
-        bindPosPair(posZSlider, posZInput, posZRead, 'pz', -5, 5);
-
-        scaleSlider.addEventListener('input', () => {
-          poseState.scale = THREE.MathUtils.clamp(parseFloat(scaleSlider.value) || 1, 0.2, 3.0);
-          scaleInput.value = poseState.scale.toFixed(2);
-          applyPoseToPivot();
-        });
-        scaleInput.addEventListener('change', () => {
-          const raw = parseFloat(scaleInput.value);
-          poseState.scale = Number.isFinite(raw) ? THREE.MathUtils.clamp(raw, 0.2, 3.0) : 1.0;
-          scaleSlider.value = poseState.scale;
-          scaleInput.value = poseState.scale.toFixed(2);
-          applyPoseToPivot();
-        });
-
-        btnGroundY0.addEventListener('click', groundModelToY0);
-        btnSideUpright.addEventListener('click', toggleSideOrVerticalPose);
-        btnResetPose.addEventListener('click', resetPoseToZero);
-        btnSavePose.addEventListener('click', saveCustomPose);
-        btnRestoreSavedPose.addEventListener('click', restoreSavedPose);
-      }
-
-      function bindPanelAndStudioControls() {
-        btnTogglePosePanel.addEventListener('click', () => {
-          const isCollapsed = posePanelEl.classList.toggle('collapsed');
-          btnTogglePosePanel.classList.toggle('active', !isCollapsed);
-        });
-        btnCollapsePose.addEventListener('click', () => {
-          posePanelEl.classList.add('collapsed');
-          btnTogglePosePanel.classList.remove('active');
-        });
-
-        btnOpenStudio.addEventListener('click', () => {
-          const isOpen = studioPanelEl.classList.toggle('open');
-          btnOpenStudio.classList.toggle('active', isOpen);
-        });
-        btnCloseStudio.addEventListener('click', () => {
-          studioPanelEl.classList.remove('open');
-          btnOpenStudio.classList.remove('active');
-        });
-
-        function setDragMode(mode) {
-          dragInteractionMode = mode;
-          dragModeCameraBtn.classList.toggle('active', mode === 'camera');
-          dragModeModelBtn.classList.toggle('active', mode === 'model');
-          showToast(mode === 'model' ? 'Arrastrar rota el modelo (X/Y)' : 'Arrastrar mueve la cámara');
-        }
-        dragModeCameraBtn.addEventListener('click', () => setDragMode('camera'));
-        dragModeModelBtn.addEventListener('click', () => setDragMode('model'));
-
-        btnUploadGltf.addEventListener('click', () => fileInputEl.click());
-        fileInputEl.addEventListener('change', (e) => {
-          const file = e.target.files && e.target.files[0];
-          if (file) handleModelFile(file);
-          fileInputEl.value = '';
-        });
-
-        let dragDepth = 0;
-        stageEl.addEventListener('dragenter', (e) => {
-          e.preventDefault();
-          dragDepth += 1;
-          dropOverlayEl.classList.add('visible');
-        });
-        stageEl.addEventListener('dragover', (e) => e.preventDefault());
-        stageEl.addEventListener('dragleave', (e) => {
-          e.preventDefault();
-          dragDepth = Math.max(0, dragDepth - 1);
-          if (dragDepth === 0) dropOverlayEl.classList.remove('visible');
-        });
-        stageEl.addEventListener('drop', (e) => {
-          e.preventDefault();
-          dragDepth = 0;
-          dropOverlayEl.classList.remove('visible');
-          const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-          if (file) handleModelFile(file);
-        });
-
-        // Single WebP & 23 WebP + auto.json triggers
-        btnCaptureSingleWebp.addEventListener('click', captureSingleWebpView);
-        quickCaptureWebp.addEventListener('click', captureSingleWebpView);
-
-        btnGenerate23Webp.addEventListener('click', generate23WebpAndAutoJson);
-        quick23WebpJson.addEventListener('click', generate23WebpAndAutoJson);
-
-        btnDownloadAutoJson.addEventListener('click', () => {
-          if (!latestAutoJsonText) return;
-          triggerFileDownload(latestAutoJsonText, 'auto.json', true);
-          showToast('auto.json descargado');
-        });
-
-        btnCopyAutoJson.addEventListener('click', () => {
-          if (!latestAutoJsonText) return;
-          autoJsonPreviewEl.focus();
-          autoJsonPreviewEl.select();
-          let ok = false;
-          try {
-            ok = document.execCommand('copy');
-          } catch (err) {
-            ok = false;
-          }
-          showToast(ok ? 'auto.json copiado al portapapeles' : 'Selecciona y copia el JSON');
-        });
-
-        function downloadAllStoredWebp() {
-          const items = latestBatchItems.length > 0
-            ? latestBatchItems.map((b) => ({ dataUrl: b.dataUrl, filename: b.file }))
-            : sessionCaptures.map((c) => ({ dataUrl: c.dataUrl, filename: c.filename }));
-          if (!items.length) return;
-          items.forEach((item, i) => {
-            setTimeout(() => triggerFileDownload(item.dataUrl, item.filename, false), i * 110);
-          });
-          showToast(`Descargando ${items.length} imágenes WebP`);
-        }
-
-        btnDownloadAllWebp.addEventListener('click', downloadAllStoredWebp);
-        btnDownloadAllGallery.addEventListener('click', downloadAllStoredWebp);
-
-        btnClearCaptures.addEventListener('click', () => {
-          sessionCaptures.length = 0;
-          latestBatchItems = [];
-          latestAutoJsonText = '';
-          autoJsonPreviewEl.value = '';
-          btnDownloadAutoJson.disabled = true;
-          btnCopyAutoJson.disabled = true;
-          webpProgressBarEl.style.width = '0%';
-          renderGalleryUI();
-          showToast('Capturas y auto.json limpiados');
-        });
-
-        // Paint swatches
-        paintSwatches.forEach((swatch) => {
-          swatch.addEventListener('click', () => {
-            paintSwatches.forEach((s) => s.classList.remove('active'));
-            swatch.classList.add('active');
-            paintActiveNameEl.textContent = swatch.dataset.name;
-            if (mats.bodyPaint) {
-              mats.bodyPaint.color.set(swatch.dataset.color);
-            }
-            if (useFallback2D) {
-              mats._fallbackColor = swatch.dataset.color;
-              drawFallback2D();
-            }
-            showToast(`Pintura: ${swatch.dataset.name}`);
-          });
-        });
-
-        studioLightSlider.addEventListener('input', () => {
-          const val = parseFloat(studioLightSlider.value) || 1.25;
-          studioLightValEl.textContent = `${val.toFixed(2)}×`;
-          if (ambientLight) ambientLight.intensity = 0.55 * val;
-          if (keyLight) keyLight.intensity = 1.55 * val;
-          if (fillLight) fillLight.intensity = 0.78 * val;
-          if (rimLight) rimLight.intensity = 0.85 * val;
-          if (underLight) underLight.intensity = 0.5 * val;
-        });
-
-        btnToggleGrid.addEventListener('click', () => {
-          const visible = !btnToggleGrid.classList.contains('active');
-          btnToggleGrid.classList.toggle('active', visible);
-          if (gridHelper) gridHelper.visible = visible;
-        });
-
-        btnToggleBg.addEventListener('click', () => {
-          lightBgMode = !lightBgMode;
-          btnToggleBg.classList.toggle('active', lightBgMode);
-          if (lightBgMode) {
-            stageEl.style.background = 'radial-gradient(circle at 50% 25%, #e2e8f0 0%, #cbd5e1 62%, #94a3b8 100%)';
-          } else {
-            stageEl.style.background = 'radial-gradient(circle at 50% 25%, #1b2840 0%, #0d1320 60%, #060911 100%)';
-          }
-        });
-
-        btnUseBuiltin.addEventListener('click', switchToBuiltinCar);
-
-        quickResetCam.addEventListener('click', () => {
-          camOrbit.target.copy(getCurrentModelWorldCenter());
-          camOrbit.spherical.set(6.2, Math.PI * 0.36, Math.PI * 0.24);
-          applyCameraSpherical();
-          showToast('Cámara centrada en el modelo');
-        });
-        quickFrontCam.addEventListener('click', () => {
-          camOrbit.target.copy(getCurrentModelWorldCenter());
-          camOrbit.spherical.set(6.0, Math.PI * 0.44, 0);
-          applyCameraSpherical();
-        });
-        quickSideCam.addEventListener('click', () => {
-          camOrbit.target.copy(getCurrentModelWorldCenter());
-          camOrbit.spherical.set(6.2, Math.PI * 0.45, Math.PI * 0.5);
-          applyCameraSpherical();
-        });
-        quickTopCam.addEventListener('click', () => {
-          camOrbit.target.copy(getCurrentModelWorldCenter());
-          camOrbit.spherical.set(6.5, 0.14, 0.3);
-          applyCameraSpherical();
-        });
-
-        btnOpenEmbed.addEventListener('click', () => {
-          embedSnippetArea.value = buildEmbedSnippet();
-          embedModalEl.classList.add('open');
-        });
-        btnCloseEmbed.addEventListener('click', () => embedModalEl.classList.remove('open'));
-        embedModalEl.addEventListener('click', (e) => {
-          if (e.target === embedModalEl) embedModalEl.classList.remove('open');
-        });
-        btnCopySnippet.addEventListener('click', () => {
-          embedSnippetArea.focus();
-          embedSnippetArea.select();
-          let ok = false;
-          try {
-            ok = document.execCommand('copy');
-          } catch (err) {
-            ok = false;
-          }
-          showToast(ok ? 'Código copiado para Google Sites' : 'Selecciona y copia el código');
-        });
-      }
-
-      function bindCanvasPointerEvents() {
-        canvasEl.addEventListener('contextmenu', (e) => e.preventDefault());
-
-        canvasEl.addEventListener('mousedown', (e) => {
-          pointerDrag.active = true;
-          pointerDrag.lastX = e.clientX;
-          pointerDrag.lastY = e.clientY;
-
-          if (e.button === 2 || e.shiftKey) {
-            pointerDrag.action = 'pan';
-          } else if (dragInteractionMode === 'model') {
-            pointerDrag.action = 'modelRotate';
-          } else {
-            pointerDrag.action = 'orbit';
-          }
-          canvasEl.classList.add('dragging');
-        });
-
-        window.addEventListener('mousemove', (e) => {
-          if (!pointerDrag.active) return;
-          const dx = e.clientX - pointerDrag.lastX;
-          const dy = e.clientY - pointerDrag.lastY;
-          pointerDrag.lastX = e.clientX;
-          pointerDrag.lastY = e.clientY;
-
-          if (pointerDrag.action === 'modelRotate') {
-            poseState.ry = clampDeg(poseState.ry + dx * 0.45);
-            poseState.rx = clampDeg(poseState.rx + dy * 0.45);
-            syncPoseControlsFromState();
-            applyPoseToPivot();
-          } else if (pointerDrag.action === 'orbit') {
-            camOrbit.spherical.theta -= dx * 0.0065;
-            camOrbit.spherical.phi -= dy * 0.0065;
-            applyCameraSpherical();
-          } else if (pointerDrag.action === 'pan' && camera) {
-            const factor = 0.003 * camOrbit.spherical.radius;
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
-            const up = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
-            camOrbit.target.addScaledVector(right, -dx * factor);
-            camOrbit.target.addScaledVector(up, dy * factor);
-            applyCameraSpherical();
-          }
-        });
-
-        window.addEventListener('mouseup', () => {
-          pointerDrag.active = false;
-          canvasEl.classList.remove('dragging');
-        });
-
-        canvasEl.addEventListener('wheel', (e) => {
-          e.preventDefault();
-          const zoom = 1 + Math.sign(e.deltaY) * 0.09;
-          camOrbit.spherical.radius = THREE.MathUtils.clamp(
-            camOrbit.spherical.radius * zoom,
-            camOrbit.minRadius,
-            camOrbit.maxRadius
-          );
-          applyCameraSpherical();
-        }, { passive: false });
-
-        canvasEl.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          if (e.touches.length === 1) {
-            pointerDrag.active = true;
-            pointerDrag.action = dragInteractionMode === 'model' ? 'modelRotate' : 'orbit';
-            pointerDrag.lastX = e.touches[0].clientX;
-            pointerDrag.lastY = e.touches[0].clientY;
-          } else if (e.touches.length === 2) {
-            pointerDrag.active = true;
-            pointerDrag.action = 'pinch';
-            const t0 = e.touches[0];
-            const t1 = e.touches[1];
-            pointerDrag.pinchDist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY) || 1;
-            pointerDrag.pinchRadius = camOrbit.spherical.radius;
-          }
-        }, { passive: false });
-
-        canvasEl.addEventListener('touchmove', (e) => {
-          e.preventDefault();
-          if (!pointerDrag.active) return;
-
-          if (e.touches.length === 1 && (pointerDrag.action === 'orbit' || pointerDrag.action === 'modelRotate')) {
-            const tx = e.touches[0].clientX;
-            const ty = e.touches[0].clientY;
-            const dx = tx - pointerDrag.lastX;
-            const dy = ty - pointerDrag.lastY;
-            pointerDrag.lastX = tx;
-            pointerDrag.lastY = ty;
-
-            if (pointerDrag.action === 'modelRotate') {
-              poseState.ry = clampDeg(poseState.ry + dx * 0.5);
-              poseState.rx = clampDeg(poseState.rx + dy * 0.5);
-              syncPoseControlsFromState();
-              applyPoseToPivot();
-            } else {
-              camOrbit.spherical.theta -= dx * 0.007;
-              camOrbit.spherical.phi -= dy * 0.007;
-              applyCameraSpherical();
-            }
-          } else if (e.touches.length === 2 && pointerDrag.action === 'pinch') {
-            const t0 = e.touches[0];
-            const t1 = e.touches[1];
-            const dist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY) || 1;
-            camOrbit.spherical.radius = THREE.MathUtils.clamp(
-              pointerDrag.pinchRadius * (pointerDrag.pinchDist / dist),
-              camOrbit.minRadius,
-              camOrbit.maxRadius
-            );
-            applyCameraSpherical();
-          }
-        }, { passive: false });
-
-        canvasEl.addEventListener('touchend', () => {
-          pointerDrag.active = false;
-        });
-      }
-
-      // =========================================================================
-      // 9. FALLBACK 2D RENDERER & RESIZE / LOOP
-      // =========================================================================
-      function drawFallback2D() {
-        const ctx = canvasEl.getContext('2d');
-        if (!ctx) return;
-        const w = canvasEl.width;
-        const h = canvasEl.height;
-
-        ctx.clearRect(0, 0, w, h);
-        ctx.save();
-
-        const cx = w * 0.5 + poseState.px * 45;
-        const cy = h * 0.62 - poseState.py * 45;
-        const s = Math.min(w, h) * 0.0024 * poseState.scale * (6.2 / camOrbit.spherical.radius);
-
-        ctx.translate(cx, cy);
-        ctx.rotate(THREE.MathUtils.degToRad(poseState.rz));
-        ctx.scale(s, s);
-
-        const bodyColor = (mats && mats._fallbackColor) || '#f1f5f9';
-        ctx.fillStyle = bodyColor;
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 2.5;
-
-        ctx.beginPath();
-        ctx.roundRect(-130, -56, 260, 46, 12);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.roundRect(-80, -96, 160, 42, 16);
-        ctx.fill();
-        ctx.stroke();
-
-        [-78, 78].forEach((wx) => {
-          ctx.fillStyle = '#111827';
-          ctx.beginPath();
-          ctx.arc(wx, -14, 22, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.fillStyle = '#cbd5e1';
-          ctx.beginPath();
-          ctx.arc(wx, -14, 11, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        ctx.restore();
-      }
-
-      function resizeCanvas() {
-        const w = Math.max(stageEl.clientWidth, 280);
-        const h = Math.max(stageEl.clientHeight, 280);
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-        if (useFallback2D) {
-          canvasEl.width = Math.floor(w * dpr);
-          canvasEl.height = Math.floor(h * dpr);
-          drawFallback2D();
-          return;
-        }
-
-        if (!renderer || !camera) return;
-        renderer.setPixelRatio(dpr);
-        renderer.setSize(w, h, false);
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-      }
-
-      function renderLoop() {
-        requestAnimationFrame(renderLoop);
-        if (isGeneratingPack) return;
-
-        if (useFallback2D) {
-          drawFallback2D();
-          return;
-        }
-        if (renderer && scene && camera) {
-          renderer.render(scene, camera);
-        }
-      }
-
-      // =========================================================================
-      // 10. INITIALIZATION
-      // =========================================================================
-      window.addEventListener('resize', resizeCanvas);
-      if (typeof ResizeObserver !== 'undefined') {
-        const observer = new ResizeObserver(resizeCanvas);
-        observer.observe(stageEl);
-      }
-
-      window.addEventListener('load', () => {
-        detectNativeWebpSupport();
-        const webglOk = initThree();
-        if (!webglOk) {
-          statusTextEl.textContent = 'Respaldo 2D activo • Pose manual y 23 WebP habilitados';
-          syncPoseControlsFromState();
-          updateGeometryStats(null, 'Polo MK4 3P (Modo 2D)');
-          resizeCanvas();
-        }
-        bindPoseControls();
-        bindPanelAndStudioControls();
-        bindCanvasPointerEvents();
-        renderGalleryUI();
-        requestAnimationFrame(renderLoop);
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+    const wrap = document.getElementById("viewport-wrap");
+    const canvas = document.getElementById("gl-canvas");
+    const modeLabel = document.getElementById("mode-label");
+    const poseReadout = document.getElementById("pose-readout");
+    const statusLine = document.getElementById("status-line");
+    const jsonPreview = document.getElementById("json-preview");
+
+    const rngYaw = document.getElementById("rng-yaw");
+    const rngPitch = document.getElementById("rng-pitch");
+    const rngRoll = document.getElementById("rng-roll");
+    const rngScale = document.getElementById("rng-scale");
+    const rngLift = document.getElementById("rng-lift");
+
+    const valYaw = document.getElementById("val-yaw");
+    const valPitch = document.getElementById("val-pitch");
+    const valRoll = document.getElementById("val-roll");
+    const valScale = document.getElementById("val-scale");
+    const valLift = document.getElementById("val-lift");
+
+    const chkTransparent = document.getElementById("chk-transparent");
+    const chkHideGrid = document.getElementById("chk-hide-grid");
+    const selSize = document.getElementById("sel-size");
+    const numCount = document.getElementById("num-count");
+    const txtPrefix = document.getElementById("txt-prefix");
+    const numStart = document.getElementById("num-start");
+    const numPad = document.getElementById("num-pad");
+
+    const btnToggleDrag = document.getElementById("btn-toggle-drag");
+    const btnToggleSpin = document.getElementById("btn-toggle-spin");
+
+    const scene = new THREE.Scene();
+    const bgColor = new THREE.Color(0x111622);
+    scene.background = bgColor.clone();
+
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    camera.position.set(3.4, 1.85, 3.8);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      preserveDrawingBuffer: true
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.target.set(0, 0.62, 0);
+    controls.minDistance = 1.6;
+    controls.maxDistance = 14;
+    controls.maxPolarAngle = Math.PI * 0.49;
+    controls.update();
+
+    const ambient = new THREE.AmbientLight(0xdbeafe, 0.85);
+    scene.add(ambient);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.1);
+    keyLight.position.set(4.5, 7.0, 4.0);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    scene.add(keyLight);
+
+    const rimLight = new THREE.DirectionalLight(0x93c5fd, 0.95);
+    rimLight.position.set(-4.5, 3.5, -4.0);
+    scene.add(rimLight);
+
+    const gridHelper = new THREE.GridHelper(10, 20, 0x3b82f6, 0x1e293b);
+    gridHelper.position.y = 0.001;
+    scene.add(gridHelper);
+
+    const shadowFloor = new THREE.Mesh(
+      new THREE.PlaneGeometry(12, 12),
+      new THREE.ShadowMaterial({ opacity: 0.35 })
+    );
+    shadowFloor.rotation.x = -Math.PI / 2;
+    shadowFloor.receiveShadow = true;
+    scene.add(shadowFloor);
+
+    const carRoot = new THREE.Group();
+    const poseGroup = new THREE.Group();
+    const modelSlot = new THREE.Group();
+    poseGroup.add(modelSlot);
+    carRoot.add(poseGroup);
+    scene.add(carRoot);
+
+    function buildPoloMk4Procedural() {
+      const group = new THREE.Group();
+
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: 0xe5e7eb,
+        metalness: 0.35,
+        roughness: 0.32
       });
-    })();
+      const trimMat = new THREE.MeshStandardMaterial({
+        color: 0x1f2937,
+        roughness: 0.75,
+        metalness: 0.1
+      });
+      const glassMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        roughness: 0.15,
+        metalness: 0.6
+      });
+      const lampMat = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        emissive: 0x334155,
+        roughness: 0.2
+      });
+      const tailMat = new THREE.MeshStandardMaterial({
+        color: 0x991b1b,
+        emissive: 0x450a0a,
+        roughness: 0.3
+      });
+      const tireMat = new THREE.MeshStandardMaterial({
+        color: 0x111318,
+        roughness: 0.85
+      });
+      const rimMat = new THREE.MeshStandardMaterial({
+        color: 0xcbd5e1,
+        metalness: 0.8,
+        roughness: 0.25
+      });
+
+      const lowerBody = new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.50, 3.84), bodyMat);
+      lowerBody.position.set(0, 0.56, 0);
+      lowerBody.castShadow = true;
+      lowerBody.receiveShadow = true;
+      group.add(lowerBody);
+
+      const hood = new THREE.Mesh(new THREE.BoxGeometry(1.56, 0.10, 1.05), bodyMat);
+      hood.position.set(0, 0.81, 1.32);
+      hood.rotation.x = 0.06;
+      hood.castShadow = true;
+      group.add(hood);
+
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.42, 0.46, 1.88), bodyMat);
+      cabin.position.set(0, 1.02, -0.22);
+      cabin.castShadow = true;
+      group.add(cabin);
+
+      const sideGlassL = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.32, 1.72), glassMat);
+      sideGlassL.position.set(0, 1.03, -0.22);
+      group.add(sideGlassL);
+
+      const bumperF = new THREE.Mesh(new THREE.BoxGeometry(1.64, 0.22, 0.22), trimMat);
+      bumperF.position.set(0, 0.38, 1.92);
+      group.add(bumperF);
+
+      const bumperR = new THREE.Mesh(new THREE.BoxGeometry(1.64, 0.22, 0.22), trimMat);
+      bumperR.position.set(0, 0.38, -1.92);
+      group.add(bumperR);
+
+      const headL = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.14, 0.12), lampMat);
+      headL.position.set(0.56, 0.66, 1.92);
+      const headR = headL.clone();
+      headR.position.x = -0.56;
+      group.add(headL, headR);
+
+      const tailL = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.10), tailMat);
+      tailL.position.set(0.62, 0.72, -1.92);
+      const tailR = tailL.clone();
+      tailR.position.x = -0.62;
+      group.add(tailL, tailR);
+
+      const wheelGeo = new THREE.CylinderGeometry(0.31, 0.31, 0.22, 24);
+      wheelGeo.rotateZ(Math.PI / 2);
+      const rimGeo = new THREE.CylinderGeometry(0.19, 0.19, 0.23, 16);
+      rimGeo.rotateZ(Math.PI / 2);
+
+      const wheelCoords = [
+        [0.78, 0.31, 1.24],
+        [-0.78, 0.31, 1.24],
+        [0.78, 0.31, -1.22],
+        [-0.78, 0.31, -1.22]
+      ];
+
+      for (const [wx, wy, wz] of wheelCoords) {
+        const wheel = new THREE.Mesh(wheelGeo, tireMat);
+        wheel.position.set(wx, wy, wz);
+        wheel.castShadow = true;
+
+        const rim = new THREE.Mesh(rimGeo, rimMat);
+        rim.position.set(wx, wy, wz);
+
+        group.add(wheel, rim);
+      }
+
+      return group;
+    }
+
+    function clearModelSlot() {
+      while (modelSlot.children.length > 0) {
+        const child = modelSlot.children[0];
+        modelSlot.remove(child);
+        child.traverse((obj) => {
+          if (obj.isMesh) {
+            obj.geometry?.dispose?.();
+            if (Array.isArray(obj.material)) {
+              obj.material.forEach((m) => m?.dispose?.());
+            } else {
+              obj.material?.dispose?.();
+            }
+          }
+        });
+      }
+    }
+
+    function normalizeAndAttach(obj) {
+      clearModelSlot();
+      obj.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      const box = new THREE.Box3().setFromObject(obj);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
+
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      const normFactor = 3.8 / maxDim;
+      obj.scale.multiplyScalar(normFactor);
+
+      const scaledBox = new THREE.Box3().setFromObject(obj);
+      const scaledCenter = new THREE.Vector3();
+      scaledBox.getCenter(scaledCenter);
+
+      obj.position.set(
+        -scaledCenter.x,
+        -scaledBox.min.y,
+        -scaledCenter.z
+      );
+
+      modelSlot.add(obj);
+      updatePose();
+    }
+
+    const poseState = {
+      yaw: 0,
+      pitch: 0,
+      roll: 0,
+      scale: 1,
+      lift: 0,
+      autoSpin: false,
+      dragModelMode: false
+    };
+
+    function updatePose() {
+      poseGroup.rotation.order = "YXZ";
+      poseGroup.rotation.y = THREE.MathUtils.degToRad(poseState.yaw);
+      poseGroup.rotation.x = THREE.MathUtils.degToRad(poseState.pitch);
+      poseGroup.rotation.z = THREE.MathUtils.degToRad(poseState.roll);
+      poseGroup.scale.setScalar(poseState.scale);
+      poseGroup.position.y = poseState.lift;
+
+      valYaw.textContent = `${Math.round(poseState.yaw)}°`;
+      valPitch.textContent = `${Math.round(poseState.pitch)}°`;
+      valRoll.textContent = `${Math.round(poseState.roll)}°`;
+      valScale.textContent = poseState.scale.toFixed(2);
+      valLift.textContent = poseState.lift.toFixed(2);
+
+      rngYaw.value = String(Math.round(poseState.yaw));
+      rngPitch.value = String(Math.round(poseState.pitch));
+      rngRoll.value = String(Math.round(poseState.roll));
+      rngScale.value = String(poseState.scale);
+      rngLift.value = String(poseState.lift);
+
+      poseReadout.textContent = `Yaw: ${Math.round(poseState.yaw)}° · Pitch: ${Math.round(poseState.pitch)}° · Roll: ${Math.round(poseState.roll)}°`;
+      refreshJsonPreview();
+    }
+
+    function setDragModelMode(enabled) {
+      poseState.dragModelMode = Boolean(enabled);
+      controls.enabled = !poseState.dragModelMode;
+      modeLabel.textContent = poseState.dragModelMode ? "Girar modelo" : "Camara (Orbit)";
+      btnToggleDrag.classList.toggle("active-mode", poseState.dragModelMode);
+    }
+
+    function setAutoSpin(enabled) {
+      poseState.autoSpin = Boolean(enabled);
+      btnToggleSpin.classList.toggle("active-mode", poseState.autoSpin);
+    }
+
+    let pointerDraggingModel = false;
+    let lastPointerX = 0;
+    let lastPointerY = 0;
+
+    function releaseModelPointerDrag() {
+      pointerDraggingModel = false;
+      controls.enabled = !poseState.dragModelMode;
+    }
+
+    canvas.addEventListener("pointerdown", (ev) => {
+      if (ev.button !== 0) return;
+      if (poseState.dragModelMode || ev.shiftKey) {
+        pointerDraggingModel = true;
+        lastPointerX = ev.clientX;
+        lastPointerY = ev.clientY;
+        controls.enabled = false;
+        try {
+          canvas.setPointerCapture(ev.pointerId);
+        } catch (_) {}
+      } else {
+        controls.enabled = true;
+      }
+    });
+
+    canvas.addEventListener("pointermove", (ev) => {
+      if (!pointerDraggingModel) return;
+      const dx = ev.clientX - lastPointerX;
+      const dy = ev.clientY - lastPointerY;
+      lastPointerX = ev.clientX;
+      lastPointerY = ev.clientY;
+
+      poseState.yaw = ((poseState.yaw + dx * 0.45 + 540) % 360) - 180;
+      poseState.pitch = THREE.MathUtils.clamp(poseState.pitch + dy * 0.35, -45, 75);
+      updatePose();
+    });
+
+    canvas.addEventListener("pointerup", releaseModelPointerDrag);
+    canvas.addEventListener("pointercancel", releaseModelPointerDrag);
+    window.addEventListener("pointerup", releaseModelPointerDrag);
+    window.addEventListener("blur", releaseModelPointerDrag);
+
+    window.addEventListener("keydown", (ev) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+
+      if (ev.key === "r" || ev.key === "R") {
+        ev.preventDefault();
+        setDragModelMode(!poseState.dragModelMode);
+      } else if (ev.code === "Space") {
+        ev.preventDefault();
+        setAutoSpin(!poseState.autoSpin);
+      }
+    });
+
+    for (const btn of document.querySelectorAll(".hud-bottom button[data-preset]")) {
+      btn.addEventListener("click", () => {
+        const p = btn.dataset.preset;
+        if (p === "3q-front") {
+          camera.position.set(3.4, 1.85, 3.8);
+          controls.target.set(0, 0.62, 0);
+        } else if (p === "side") {
+          camera.position.set(5.2, 1.1, 0.0);
+          controls.target.set(0, 0.62, 0);
+        } else if (p === "3q-rear") {
+          camera.position.set(-3.4, 1.85, -3.8);
+          controls.target.set(0, 0.62, 0);
+        } else if (p === "top") {
+          camera.position.set(0.01, 6.4, 0.01);
+          controls.target.set(0, 0.5, 0);
+        } else if (p === "reset") {
+          camera.position.set(3.4, 1.85, 3.8);
+          controls.target.set(0, 0.62, 0);
+        }
+        controls.update();
+      });
+    }
+
+    rngYaw.addEventListener("input", () => { poseState.yaw = Number(rngYaw.value); updatePose(); });
+    rngPitch.addEventListener("input", () => { poseState.pitch = Number(rngPitch.value); updatePose(); });
+    rngRoll.addEventListener("input", () => { poseState.roll = Number(rngRoll.value); updatePose(); });
+    rngScale.addEventListener("input", () => { poseState.scale = Number(rngScale.value); updatePose(); });
+    rngLift.addEventListener("input", () => { poseState.lift = Number(rngLift.value); updatePose(); });
+
+    document.getElementById("btn-toggle-drag").addEventListener("click", () => {
+      setDragModelMode(!poseState.dragModelMode);
+    });
+
+    document.getElementById("btn-toggle-spin").addEventListener("click", () => {
+      setAutoSpin(!poseState.autoSpin);
+    });
+
+    document.getElementById("btn-reset-pose").addEventListener("click", () => {
+      poseState.yaw = 0;
+      poseState.pitch = 0;
+      poseState.roll = 0;
+      poseState.scale = 1;
+      poseState.lift = 0;
+      updatePose();
+    });
+
+    const gltfLoader = new GLTFLoader();
+    const glbInput = document.getElementById("glb-input");
+    const dropzone = document.getElementById("dropzone");
+
+    function loadGlbFile(file) {
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      statusLine.textContent = `Cargando ${file.name}...`;
+      gltfLoader.load(
+        url,
+        (gltf) => {
+          normalizeAndAttach(gltf.scene);
+          URL.revokeObjectURL(url);
+          statusLine.textContent = `Cargado: ${file.name}`;
+        },
+        undefined,
+        () => {
+          URL.revokeObjectURL(url);
+          statusLine.textContent = "No se pudo cargar el modelo seleccionado.";
+        }
+      );
+    }
+
+    document.getElementById("btn-choose-glb").addEventListener("click", () => glbInput.click());
+    dropzone.addEventListener("click", () => glbInput.click());
+    glbInput.addEventListener("change", (e) => loadGlbFile(e.target.files?.[0]));
+
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      const file = e.dataTransfer?.files?.[0];
+      if (file) loadGlbFile(file);
+    });
+
+    document.getElementById("btn-reset-model").addEventListener("click", () => {
+      normalizeAndAttach(buildPoloMk4Procedural());
+      statusLine.textContent = "Modelo base VW Polo MK4 3P restaurado.";
+    });
+
+    function sanitizePrefix(raw) {
+      return String(raw || "")
+        .trim()
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
+    }
+
+    function buildFrameNames() {
+      const count = Math.max(1, Math.min(120, Number(numCount.value) || 24));
+      const start = Math.max(0, Number(numStart.value) || 0);
+      const pad = Math.max(1, Math.min(4, Number(numPad.value) || 2));
+      const prefix = sanitizePrefix(txtPrefix.value);
+
+      const used = new Set();
+      const names = [];
+      for (let i = 0; i < count; i++) {
+        const idxStr = String(start + i).padStart(pad, "0");
+        let base = `${prefix}${idxStr}.webp`;
+        if (used.has(base)) {
+          base = `${prefix}${idxStr}_${i}.webp`;
+        }
+        used.add(base);
+        names.push(base);
+      }
+      return names;
+    }
+
+    document.getElementById("preset-24-num").addEventListener("click", () => {
+      numCount.value = "24";
+      txtPrefix.value = "";
+      numStart.value = "0";
+      numPad.value = "2";
+      refreshJsonPreview();
+    });
+
+    document.getElementById("preset-23-num").addEventListener("click", () => {
+      numCount.value = "23";
+      txtPrefix.value = "";
+      numStart.value = "0";
+      numPad.value = "2";
+      refreshJsonPreview();
+    });
+
+    document.getElementById("preset-23-auto").addEventListener("click", () => {
+      numCount.value = "23";
+      txtPrefix.value = "auto_";
+      numStart.value = "1";
+      numPad.value = "2";
+      refreshJsonPreview();
+    });
+
+    function buildManifestObject() {
+      const frames = buildFrameNames();
+      return {
+        id: "vw-polo",
+        name: "VW Polo MK4 3P",
+        make: "Volkswagen",
+        year: 2003,
+        spin: frames.length,
+        frames,
+        pose: {
+          yaw: Number(poseState.yaw),
+          pitch: Number(poseState.pitch),
+          roll: Number(poseState.roll),
+          scale: Number(poseState.scale),
+          lift: Number(poseState.lift)
+        },
+        capture: {
+          transparentBackground: Boolean(chkTransparent.checked),
+          gridHidden: Boolean(chkHideGrid.checked),
+          size: Number(selSize.value) || 512
+        }
+      };
+    }
+
+    function refreshJsonPreview() {
+      jsonPreview.textContent = JSON.stringify(buildManifestObject(), null, 2);
+    }
+
+    for (const el of [chkTransparent, chkHideGrid, selSize, numCount, txtPrefix, numStart, numPad]) {
+      el.addEventListener("input", refreshJsonPreview);
+      el.addEventListener("change", refreshJsonPreview);
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function waitNextFrame() {
+      return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+    }
+
+    async function exportFrames() {
+      const frames = buildFrameNames();
+      const size = Number(selSize.value) || 512;
+      const transparent = Boolean(chkTransparent.checked);
+      const hideGrid = Boolean(chkHideGrid.checked);
+
+      const prevBg = scene.background;
+      const prevGridVis = gridHelper.visible;
+      const prevFloorVis = shadowFloor.visible;
+      const prevSpin = poseState.autoSpin;
+      const prevYaw = poseState.yaw;
+
+      const prevSize = new THREE.Vector2();
+      const prevPixelRatio = renderer.getPixelRatio();
+      renderer.getSize(prevSize);
+
+      setAutoSpin(false);
+      renderer.setPixelRatio(1);
+      renderer.setSize(size, size, false);
+      camera.aspect = 1;
+      camera.updateProjectionMatrix();
+
+      if (transparent) {
+        scene.background = null;
+      }
+      if (hideGrid) {
+        gridHelper.visible = false;
+        shadowFloor.visible = false;
+      }
+
+      try {
+        for (let i = 0; i < frames.length; i++) {
+          const stepYaw = (360 / frames.length) * i;
+          poseState.yaw = ((prevYaw + stepYaw + 540) % 360) - 180;
+          poseGroup.rotation.y = THREE.MathUtils.degToRad(poseState.yaw);
+
+          renderer.render(scene, camera);
+          await waitNextFrame();
+
+          const blob = await new Promise((resolve) =>
+            canvas.toBlob((b) => resolve(b), "image/webp", 0.92)
+          );
+          if (blob) {
+            downloadBlob(blob, frames[i]);
+          }
+          statusLine.textContent = `Exportando ${i + 1}/${frames.length}: ${frames[i]}`;
+          await new Promise((r) => setTimeout(r, 70));
+        }
+        statusLine.textContent = `Completado: ${frames.length} archivos WebP generados.`;
+      } finally {
+        poseState.yaw = prevYaw;
+        scene.background = prevBg;
+        gridHelper.visible = prevGridVis;
+        shadowFloor.visible = prevFloorVis;
+        renderer.setPixelRatio(prevPixelRatio);
+        renderer.setSize(prevSize.x, prevSize.y, false);
+        camera.aspect = Math.max(0.1, prevSize.x / Math.max(1, prevSize.y));
+        camera.updateProjectionMatrix();
+        setAutoSpin(prevSpin);
+        updatePose();
+      }
+    }
+
+    document.getElementById("btn-export-frames").addEventListener("click", () => {
+      exportFrames().catch(() => {
+        statusLine.textContent = "Error al exportar los frames WebP.";
+      });
+    });
+
+    document.getElementById("btn-export-json").addEventListener("click", () => {
+      const content = JSON.stringify(buildManifestObject(), null, 2);
+      const blob = new Blob([content], { type: "application/json;charset=utf-8" });
+      downloadBlob(blob, "auto.json");
+      statusLine.textContent = "Descargado auto.json.";
+    });
+
+    function resizeViewport() {
+      const rect = wrap.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width));
+      const h = Math.max(1, Math.floor(rect.height));
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+
+    window.addEventListener("resize", resizeViewport);
+
+    normalizeAndAttach(buildPoloMk4Procedural());
+    resizeViewport();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (poseState.autoSpin && !pointerDraggingModel) {
+        poseState.yaw = ((poseState.yaw + 0.5 + 540) % 360) - 180;
+        updatePose();
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
   </script>
 </body>
 </html>
