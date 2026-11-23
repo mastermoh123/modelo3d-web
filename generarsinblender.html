@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generador Giro LiteDash v4 - VW Polo</title>
+  <title>Generador Giro LiteDash v6 - VW Polo</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -33,7 +33,7 @@
       font-size: 13px;
       color: #cbd5e1;
     }
-    input[type="range"] { width: 100px; cursor: pointer; }
+    input[type="range"] { width: 105px; cursor: pointer; }
     input[type="file"] { color: #cbd5e1; font-size: 13px; }
     select {
       background: #0f1319;
@@ -92,11 +92,19 @@
   </script>
 </head>
 <body>
-  <h2>Generador de Giro 360° para LiteDash (v4)</h2>
-  <p class="desc">Giro en eje Y con corrección fija de inclinación (eje X / eje Z) para enderezar modelos .glb torcidos.</p>
+  <h2>Generador de 24 Ángulos para LiteDash (v6)</h2>
+  <p class="desc">Recorre 24 ángulos combinando giro horizontal (puertas/laterales/frente/trasera) e inclinación vertical (techo y bajos del coche).</p>
 
   <div class="panel">
     <input type="file" id="fileInput" accept=".glb,.gltf" />
+
+    <div class="control-group">
+      <label for="modeSelect">Recorrido 24 cuadros:</label>
+      <select id="modeSelect">
+        <option value="orbital" selected>360° + Techo y Bajos (24 ángulos)</option>
+        <option value="horizontal">Solo 360° horizontal (24 ángulos)</option>
+      </select>
+    </div>
 
     <div class="control-group">
       <label for="dirSelect">Sentido Y:</label>
@@ -119,22 +127,16 @@
     </div>
 
     <div class="control-group">
-      <label for="heightSlider">Altura cámara:</label>
-      <input type="range" id="heightSlider" min="0.4" max="1.6" step="0.05" value="0.85" />
-      <span id="heightVal">0.85</span>
-    </div>
-
-    <div class="control-group">
       <label for="distSlider">Distancia:</label>
-      <input type="range" id="distSlider" min="3.0" max="7.5" step="0.1" value="4.6" />
-      <span id="distVal">4.6</span>
+      <input type="range" id="distSlider" min="3.0" max="7.5" step="0.1" value="4.8" />
+      <span id="distVal">4.8</span>
     </div>
 
     <button id="resetCamBtn" type="button">Restablecer</button>
-    <button id="exportBtn" type="button" disabled>Generar y descargar 24 WebP + auto.json</button>
+    <button id="exportBtn" type="button" disabled>Generar 24 ángulos + auto.json</button>
   </div>
 
-  <p id="status">Selecciona tu archivo polo.glb y usa Corregir X / Z si el coche viene inclinado.</p>
+  <p id="status">Selecciona polo.glb; al generar recorrerá los 24 ángulos (laterales/puertas, techo y bajos).</p>
 
   <div class="viewport-wrap">
     <canvas id="c" width="640" height="360"></canvas>
@@ -153,16 +155,15 @@
     const statusEl = document.getElementById('status');
     const exportBtn = document.getElementById('exportBtn');
     const resetCamBtn = document.getElementById('resetCamBtn');
+    const modeSelect = document.getElementById('modeSelect');
     const dirSelect = document.getElementById('dirSelect');
 
     const fixXSlider = document.getElementById('fixXSlider');
     const fixZSlider = document.getElementById('fixZSlider');
-    const heightSlider = document.getElementById('heightSlider');
     const distSlider = document.getElementById('distSlider');
 
     const fixXVal = document.getElementById('fixXVal');
     const fixZVal = document.getElementById('fixZVal');
-    const heightVal = document.getElementById('heightVal');
     const distVal = document.getElementById('distVal');
 
     const renderer = new THREE.WebGLRenderer({
@@ -178,25 +179,29 @@
     renderer.toneMappingExposure = 1.05;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(35, WIDTH / HEIGHT, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(36, WIDTH / HEIGHT, 0.1, 100);
 
     const controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
 
     const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
     keyLight.position.set(5.5, 6.0, 5.5);
     scene.add(keyLight);
 
-    const sideFillLight = new THREE.DirectionalLight(0xdbeafe, 1.35);
+    const sideFillLight = new THREE.DirectionalLight(0xdbeafe, 1.4);
     sideFillLight.position.set(-6.0, 2.5, 4.0);
     scene.add(sideFillLight);
 
-    const backLight = new THREE.DirectionalLight(0xe2e8f0, 1.1);
-    backLight.position.set(0.0, 3.5, -6.5);
+    const backLight = new THREE.DirectionalLight(0xe2e8f0, 1.2);
+    backLight.position.set(0.0, 4.0, -6.5);
     scene.add(backLight);
+
+    const underFillLight = new THREE.DirectionalLight(0xcbd5e1, 1.15);
+    underFillLight.position.set(0.0, -5.5, 3.0);
+    scene.add(underFillLight);
 
     let carRoot = null;
     let modelMesh = null;
@@ -214,33 +219,30 @@
     function applyFramingFromSliders() {
       const fx = parseFloat(fixXSlider.value) || 0;
       const fz = parseFloat(fixZSlider.value) || 0;
-      const h = parseFloat(heightSlider.value) || 0.85;
-      const d = parseFloat(distSlider.value) || 4.6;
+      const d = parseFloat(distSlider.value) || 4.8;
 
       fixXVal.textContent = `${fx}°`;
       fixZVal.textContent = `${fz}°`;
-      heightVal.textContent = h.toFixed(2);
       distVal.textContent = d.toFixed(1);
 
       applyModelTilt();
 
       const diag = d * 0.7071;
-      camera.position.set(diag, h, diag);
-      controls.target.set(0, 0.50, 0);
+      camera.position.set(diag, 0.85, diag);
+      controls.target.set(0, 0.45, 0);
       controls.update();
     }
 
     applyFramingFromSliders();
 
-    [fixXSlider, fixZSlider, heightSlider, distSlider].forEach((slider) => {
+    [fixXSlider, fixZSlider, distSlider].forEach((slider) => {
       slider.addEventListener('input', applyFramingFromSliders);
     });
 
     resetCamBtn.addEventListener('click', () => {
       fixXSlider.value = '0';
       fixZSlider.value = '0';
-      heightSlider.value = '0.85';
-      distSlider.value = '4.6';
+      distSlider.value = '4.8';
       applyFramingFromSliders();
     });
 
@@ -263,12 +265,12 @@
           const size = box.getSize(new THREE.Vector3());
           const center = box.getCenter(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z, 0.001);
-          const scale = 3.2 / maxDim;
+          const scale = 3.0 / maxDim;
 
           modelMesh.scale.setScalar(scale);
           modelMesh.position.set(
             -center.x * scale,
-            -box.min.y * scale,
+            -center.y * scale,
             -center.z * scale
           );
 
@@ -277,7 +279,7 @@
 
           applyFramingFromSliders();
           exportBtn.disabled = false;
-          statusEl.textContent = 'Modelo cargado. Ajusta Corregir X / Z si está inclinado y exporta.';
+          statusEl.textContent = 'Modelo cargado. Pulsa Generar para recorrer los 24 ángulos automáticamente.';
           URL.revokeObjectURL(url);
         },
         undefined,
@@ -309,24 +311,72 @@
       setTimeout(() => URL.revokeObjectURL(objectUrl), 2500);
     }
 
+    function waitNextFrame() {
+      return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+    }
+
+    function poseForFrame(index, total, mode, dir, radius) {
+      const t = (2 * Math.PI * index) / total;
+      const yaw = dir * t;
+
+      if (mode === 'horizontal') {
+        const horizRadius = radius * 0.94;
+        camera.position.set(
+          Math.sin(yaw) * horizRadius,
+          0.55,
+          Math.cos(yaw) * horizRadius
+        );
+        camera.lookAt(0, 0.15, 0);
+        return '360° lateral/puertas';
+      }
+
+      // Recorrido orbital en 24 pasos: alterna laterales/puertas, techo (elevación positiva) y bajos (elevación negativa)
+      const elevWave = Math.sin(t * 2);
+      const maxElevationRad = THREE.MathUtils.degToRad(58);
+      const elevation = elevWave * maxElevationRad;
+
+      const cosEl = Math.cos(elevation);
+      const sinEl = Math.sin(elevation);
+
+      camera.position.set(
+        Math.sin(yaw) * radius * cosEl,
+        radius * sinEl,
+        Math.cos(yaw) * radius * cosEl
+      );
+      camera.lookAt(0, 0, 0);
+
+      if (elevation > 0.25) return 'techo + costado';
+      if (elevation < -0.25) return 'bajos + costado';
+      return 'puertas / costado';
+    }
+
     exportBtn.addEventListener('click', async () => {
       if (!carRoot || isExporting) return;
 
       isExporting = true;
       exportBtn.disabled = true;
       resetCamBtn.disabled = true;
+      modeSelect.disabled = true;
       dirSelect.disabled = true;
 
-      const originalRotationY = carRoot.rotation.y;
+      const originalCamPos = camera.position.clone();
       const originalDamping = controls.enableDamping;
+      const mode = modeSelect.value;
       const dir = parseFloat(dirSelect.value) || 1;
+      const radius = parseFloat(distSlider.value) || 4.8;
+
       controls.enableDamping = false;
+      carRoot.rotation.set(0, 0, 0);
       applyModelTilt();
 
       try {
         for (let i = 0; i < FRAMES; i++) {
-          carRoot.rotation.set(0, dir * (2 * Math.PI * i) / FRAMES, 0);
+          const zoneLabel = poseForFrame(i, FRAMES, mode, dir, radius);
+          const deg = Math.round(((i * 360) / FRAMES) % 360);
+
           carRoot.updateMatrixWorld(true);
+          renderer.render(scene, camera);
+          await waitNextFrame();
           renderer.render(scene, camera);
 
           const blob = await new Promise((resolve) =>
@@ -337,8 +387,8 @@
             downloadBlob(blob, `${String(i).padStart(2, '0')}.webp`);
           }
 
-          statusEl.textContent = `Exportando cuadro ${i + 1} de ${FRAMES}...`;
-          await new Promise((r) => setTimeout(r, 220));
+          statusEl.textContent = `Girando solo: cuadro ${i + 1}/${FRAMES} (${deg}°) — ${zoneLabel}...`;
+          await new Promise((r) => setTimeout(r, 240));
         }
 
         const autoJson = JSON.stringify(
@@ -359,15 +409,17 @@
         );
 
         downloadBlob(new Blob([autoJson], { type: 'application/json' }), 'auto.json');
-        statusEl.textContent = 'Listo: coloca 00.webp..23.webp dentro de giro/ y auto.json junto a giro/ en assets/cars/vw-polo/.';
+        statusEl.textContent = 'Listo (24 ángulos): pon 00.webp..23.webp dentro de giro/ y auto.json junto a giro/ en assets/cars/vw-polo/.';
       } finally {
-        carRoot.rotation.y = originalRotationY;
-        carRoot.updateMatrixWorld(true);
+        camera.position.copy(originalCamPos);
+        controls.target.set(0, 0.45, 0);
         controls.enableDamping = originalDamping;
+        controls.update();
         renderer.render(scene, camera);
         isExporting = false;
         exportBtn.disabled = false;
         resetCamBtn.disabled = false;
+        modeSelect.disabled = false;
         dirSelect.disabled = false;
       }
     });
