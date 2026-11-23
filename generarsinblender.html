@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VW Polo MK4 3-Door Visor 3D v11 — Pose Manual y Capturas</title>
+  <title>VW Polo MK4 3-Door Visor 3D v12 — Pose Manual, 23 WebP y auto.json</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -50,7 +50,7 @@
     }
 
     .glass-panel {
-      background: rgba(15, 23, 42, 0.78);
+      background: rgba(15, 23, 42, 0.80);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(148, 163, 184, 0.18);
@@ -107,6 +107,16 @@
       background: linear-gradient(135deg, #3b82f6, #2563eb);
     }
 
+    .ui-btn.emerald {
+      background: linear-gradient(135deg, #059669, #047857);
+      border-color: rgba(110, 231, 183, 0.5);
+      color: #ecfdf5;
+    }
+
+    .ui-btn.emerald:hover:not(:disabled) {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
     .step-btn {
       width: 26px;
       height: 26px;
@@ -156,7 +166,7 @@
       position: absolute;
       top: 66px;
       left: 12px;
-      width: min(350px, calc(100vw - 24px));
+      width: min(355px, calc(100vw - 24px));
       max-height: calc(100% - 140px);
       overflow-y: auto;
       z-index: 25;
@@ -177,7 +187,7 @@
       position: absolute;
       top: 66px;
       right: 12px;
-      width: min(340px, calc(100vw - 24px));
+      width: min(350px, calc(100vw - 24px));
       max-height: calc(100% - 140px);
       overflow-y: auto;
       z-index: 25;
@@ -210,7 +220,6 @@
       gap: 6px;
     }
 
-    /* Capture strip inside panel/drawer */
     .capture-thumb-card {
       position: relative;
       border-radius: 10px;
@@ -222,7 +231,7 @@
     .capture-thumb-card img {
       display: block;
       width: 100%;
-      height: 76px;
+      height: 68px;
       object-fit: cover;
     }
 
@@ -307,7 +316,7 @@
   </style>
 </head>
 <body>
-  <div id="viewer-stage" role="region" aria-label="Visor 3D VW Polo MK4 3 Puertas v11">
+  <div id="viewer-stage" role="region" aria-label="Visor 3D VW Polo MK4 3 Puertas v12">
     <canvas id="viewer-canvas"></canvas>
 
     <!-- Top Header Bar -->
@@ -318,11 +327,11 @@
             <span class="text-xs sm:text-sm font-semibold text-white tracking-tight">
               VW Polo MK4 3 Puertas (2001–2009)
             </span>
-            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-blue-500/25 text-blue-300 border border-blue-400/35">
-              v11
+            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/25 text-emerald-300 border border-emerald-400/35">
+              v12 • 23 WebP + auto.json
             </span>
           </div>
-          <p id="status-bar-text" class="text-[11px] text-slate-300 truncate max-w-[230px] sm:max-w-[390px]">
+          <p id="status-bar-text" class="text-[11px] text-slate-300 truncate max-w-[230px] sm:max-w-[420px]">
             Pose libre activa • Sin sobrescritura automática
           </p>
         </div>
@@ -331,7 +340,7 @@
       <div class="flex flex-wrap items-center gap-1.5 pointer-events-auto">
         <button id="btn-toggle-pose-panel" type="button" class="ui-btn active" title="Mostrar/ocultar panel de pose y capturas">
           <span>🎛️</span>
-          <span>Pose y Capturas</span>
+          <span>Pose y 23 WebP</span>
         </button>
 
         <!-- Drag interaction mode: Camera Orbit vs Direct Model Rotation -->
@@ -363,12 +372,12 @@
 
     <input id="file-input-model" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" class="hidden" />
 
-    <!-- Left Dock: Manual Pose Controls & Pose-Based Captures -->
-    <aside id="pose-panel" class="glass-panel text-xs text-slate-200 space-y-4" aria-label="Control manual de pose y capturas">
+    <!-- Left Dock: Manual Pose Controls & 23 WebP + auto.json Batch -->
+    <aside id="pose-panel" class="glass-panel text-xs text-slate-200 space-y-4" aria-label="Control manual de pose, 23 WebP y auto.json">
       <div class="flex items-center justify-between border-b border-slate-700/70 pb-2">
         <div>
           <h2 class="text-sm font-semibold text-white">Pose Manual del Modelo</h2>
-          <p class="text-[11px] text-slate-400">Colócalo como quieras y captura desde esa pose</p>
+          <p class="text-[11px] text-slate-400">Colócalo como quieras y genera 23 WebP + auto.json</p>
         </div>
         <button id="btn-collapse-pose" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[11px]">✕</button>
       </div>
@@ -496,19 +505,40 @@
         </button>
       </div>
 
-      <!-- Acciones de Captura basadas en la pose actual -->
+      <!-- Generador de 23 Fotos WebP + auto.json según la pose actual -->
       <div class="space-y-2 border-t border-slate-700/70 pt-3">
-        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-          Capturas Según Tu Pose
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            Pack 23 WebP + auto.json
+          </span>
+          <span id="webp-codec-badge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+            WebP nativo / fallback
+          </span>
         </div>
-        <button id="btn-capture-current" type="button" class="ui-btn primary w-full !py-2 text-xs">
-          📸 Capturar vista actual (PNG)
+
+        <button id="btn-capture-single-webp" type="button" class="ui-btn w-full !py-1.5 text-xs">
+          📸 Capturar vista actual (WebP)
         </button>
-        <button id="btn-generate-pose-pack" type="button" class="ui-btn w-full !py-2 text-xs">
-          📦 Generar pack de capturas según mi pose
+
+        <button id="btn-generate-23-webp" type="button" class="ui-btn emerald w-full !py-2 text-xs font-semibold">
+          ⚡ Generar 23 WebP + auto.json según mi pose
         </button>
-        <div id="capture-progress-label" class="text-[11px] text-slate-400 text-center">
-          6 ángulos relativos a tu pose: Frontal, Trasera, Lat. Izq, Lat. Der, Superior y 3/4.
+
+        <div class="grid grid-cols-2 gap-1.5">
+          <button id="btn-download-auto-json" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]" disabled>
+            📄 Descargar auto.json
+          </button>
+          <button id="btn-download-all-webp" type="button" class="ui-btn !py-1.5 !px-2 text-[11px]" disabled>
+            ⬇️ Descargar 23 WebP
+          </button>
+        </div>
+
+        <div class="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+          <div id="webp-progress-bar" class="h-full bg-emerald-500 transition-all duration-150" style="width: 0%;"></div>
+        </div>
+
+        <div id="capture-progress-label" class="text-[11px] text-slate-300 text-center leading-snug">
+          Listo para generar 23 vistas WebP + <strong>auto.json</strong> respetando tu pose actual.
         </div>
       </div>
     </aside>
@@ -516,7 +546,7 @@
     <!-- Right Drawer: Studio Appearance, Model Info & Capture Gallery -->
     <aside id="studio-panel" class="glass-panel text-xs text-slate-200 space-y-4" aria-label="Estudio, modelo y galería de capturas">
       <div class="flex items-center justify-between border-b border-slate-700/70 pb-2">
-        <span class="text-sm font-semibold text-white">Estudio y Galería de Capturas</span>
+        <span class="text-sm font-semibold text-white">Estudio, auto.json y Galería</span>
         <button id="btn-close-studio" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[11px]">✕</button>
       </div>
 
@@ -569,15 +599,26 @@
         </div>
       </div>
 
-      <!-- Galería de capturas realizadas -->
+      <!-- Vista previa de auto.json -->
+      <div class="space-y-1.5 border-t border-slate-700/70 pt-3">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Vista previa auto.json</span>
+          <button id="btn-copy-auto-json" type="button" class="ui-btn !min-h-0 !px-2 !py-0.5 text-[10px]" disabled>
+            📋 Copiar JSON
+          </button>
+        </div>
+        <textarea id="auto-json-preview" rows="5" readonly class="w-full p-2 rounded-lg bg-slate-950 border border-slate-800 text-[10.5px] font-mono text-emerald-300 resize-none" placeholder="Genera el pack de 23 WebP para ver y descargar auto.json aquí..."></textarea>
+      </div>
+
+      <!-- Galería de capturas WebP -->
       <div class="space-y-2 border-t border-slate-700/70 pt-3">
         <div class="flex items-center justify-between">
           <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            Capturas (<span id="gallery-count">0</span>)
+            Capturas WebP (<span id="gallery-count">0</span>)
           </span>
           <div class="flex items-center gap-1">
-            <button id="btn-download-all-captures" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[10.5px]" disabled>
-              ⬇️ Descargar todas
+            <button id="btn-download-all-gallery" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[10.5px]" disabled>
+              ⬇️ Todas
             </button>
             <button id="btn-clear-captures" type="button" class="ui-btn !min-h-0 !px-2 !py-1 text-[10.5px]" disabled>
               🗑️ Limpiar
@@ -586,13 +627,13 @@
         </div>
         <div id="captures-gallery" class="grid grid-cols-2 gap-2">
           <div class="col-span-2 text-center py-4 text-[11px] text-slate-400 rounded-lg bg-slate-900/50 border border-slate-800/80">
-            Aún no hay capturas. Usa "Capturar vista actual" o "Generar pack de capturas según mi pose".
+            Aún no hay capturas. Pulsa "Generar 23 WebP + auto.json según mi pose".
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- Bottom Quick Bar: Camera Reset + Direct Capture Triggers -->
+    <!-- Bottom Quick Bar -->
     <nav id="bottom-bar" class="glass-panel" aria-label="Acciones rápidas de cámara y captura">
       <button id="quick-reset-cam" type="button" class="ui-btn !py-1.5 !px-2.5 text-[11px]" title="Centrar cámara en el modelo">
         🎯 Centrar cámara
@@ -607,11 +648,11 @@
         Superior
       </button>
       <span class="hidden sm:inline-block h-5 w-px bg-slate-700/80 mx-0.5"></span>
-      <button id="quick-capture-png" type="button" class="ui-btn primary !py-1.5 !px-3 text-[11px]">
-        📸 Capturar PNG
+      <button id="quick-capture-webp" type="button" class="ui-btn primary !py-1.5 !px-3 text-[11px]">
+        📸 Capturar WebP
       </button>
-      <button id="quick-pack-png" type="button" class="ui-btn !py-1.5 !px-3 text-[11px]">
-        📦 Pack por pose
+      <button id="quick-23-webp-json" type="button" class="ui-btn emerald !py-1.5 !px-3 text-[11px]">
+        ⚡ 23 WebP + auto.json
       </button>
     </nav>
 
@@ -619,7 +660,7 @@
     <div id="drop-zone-overlay">
       <div class="text-3xl">🚘</div>
       <div class="text-sm font-semibold text-white">Suelta aquí tu archivo .GLB o .GLTF</div>
-      <div class="text-xs text-slate-300">Se cargará respetando tu pose o en 0°,0°,0° si lo deseas</div>
+      <div class="text-xs text-slate-300">Se cargará conservando tu pose manual</div>
     </div>
 
     <!-- Toast -->
@@ -631,7 +672,7 @@
     <div class="glass-panel w-full max-w-lg p-5 space-y-4 text-slate-100">
       <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
         <div>
-          <h2 id="embed-modal-heading" class="text-sm font-semibold text-white">Insertar en Google Sites (v11)</h2>
+          <h2 id="embed-modal-heading" class="text-sm font-semibold text-white">Insertar en Google Sites (v12)</h2>
           <p class="text-[11px] text-slate-400">
             En Google Sites: <strong class="text-slate-200">Insertar &gt; Incorporar &gt; Código incorporado</strong>.
           </p>
@@ -650,8 +691,8 @@
       </div>
 
       <div class="rounded-lg bg-slate-900/80 border border-slate-800 p-3 text-[11px] text-slate-300 space-y-1">
-        <div>• Configurado con <code class="text-blue-300">preserveDrawingBuffer: true</code> para que las capturas PNG funcionen siempre.</div>
-        <div>• Incluye respaldo 2D automático si un entorno embebido bloquea WebGL.</div>
+        <div>• Genera 23 imágenes <code class="text-emerald-300">auto_01.webp</code> … <code class="text-emerald-300">auto_23.webp</code> y el manifiesto <code class="text-emerald-300">auto.json</code>.</div>
+        <div>• Incluye conversión automática PNG-a-WebP vía canvas si el navegador limita la codificación directa.</div>
       </div>
     </div>
   </div>
@@ -713,15 +754,22 @@
       const btnSavePose = document.getElementById('btn-save-pose');
       const btnRestoreSavedPose = document.getElementById('btn-restore-saved-pose');
 
-      // Capture buttons & gallery
-      const btnCaptureCurrent = document.getElementById('btn-capture-current');
-      const btnGeneratePosePack = document.getElementById('btn-generate-pose-pack');
-      const quickCapturePng = document.getElementById('quick-capture-png');
-      const quickPackPng = document.getElementById('quick-pack-png');
+      // 23 WebP + auto.json controls
+      const webpCodecBadgeEl = document.getElementById('webp-codec-badge');
+      const btnCaptureSingleWebp = document.getElementById('btn-capture-single-webp');
+      const btnGenerate23Webp = document.getElementById('btn-generate-23-webp');
+      const btnDownloadAutoJson = document.getElementById('btn-download-auto-json');
+      const btnDownloadAllWebp = document.getElementById('btn-download-all-webp');
+      const quickCaptureWebp = document.getElementById('quick-capture-webp');
+      const quick23WebpJson = document.getElementById('quick-23-webp-json');
+      const webpProgressBarEl = document.getElementById('webp-progress-bar');
       const captureProgressLabel = document.getElementById('capture-progress-label');
+
+      const autoJsonPreviewEl = document.getElementById('auto-json-preview');
+      const btnCopyAutoJson = document.getElementById('btn-copy-auto-json');
       const capturesGalleryEl = document.getElementById('captures-gallery');
       const galleryCountEl = document.getElementById('gallery-count');
-      const btnDownloadAllCaptures = document.getElementById('btn-download-all-captures');
+      const btnDownloadAllGallery = document.getElementById('btn-download-all-gallery');
       const btnClearCaptures = document.getElementById('btn-clear-captures');
 
       // Studio & quick camera buttons
@@ -747,10 +795,10 @@
 
       // Manual pose state (never forced back to auto-orient once user edits)
       const poseState = {
-        rx: 0, // degrees [-180..180]
+        rx: 0,
         ry: 0,
         rz: 0,
-        px: 0, // meters
+        px: 0,
         py: 0,
         pz: 0,
         scale: 1.0
@@ -762,8 +810,12 @@
       let isGeneratingPack = false;
       let useFallback2D = false;
       let lightBgMode = false;
+      let nativeWebpSupported = true;
+      let activeSourceName = 'Polo MK4 3P (Integrado)';
+      let latestAutoJsonText = '';
+      let latestBatchItems = [];
 
-      // Camera spherical state around current model center / origin
+      // Camera spherical state
       const camOrbit = {
         target: new THREE.Vector3(0, 0.72, 0),
         spherical: new THREE.Spherical(6.2, Math.PI * 0.36, Math.PI * 0.24),
@@ -775,7 +827,7 @@
 
       const pointerDrag = {
         active: false,
-        action: 'orbit', // 'orbit' | 'pan' | 'pinch' | 'modelRotate'
+        action: 'orbit',
         lastX: 0,
         lastY: 0,
         pinchDist: 0,
@@ -810,7 +862,7 @@
         underbody: null
       };
 
-      // Stored session captures: { id, label, filename, dataUrl }
+      // Stored captures: { id, label, filename, dataUrl, isWebp, shotIndex }
       const sessionCaptures = [];
 
       // =========================================================================
@@ -823,7 +875,7 @@
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => {
           toastEl.classList.remove('show');
-        }, 2400);
+        }, 2500);
       }
 
       function clampDeg(val) {
@@ -834,13 +886,33 @@
         return Math.round(n * 100) / 100;
       }
 
+      function detectNativeWebpSupport() {
+        try {
+          const testCanvas = document.createElement('canvas');
+          testCanvas.width = 4;
+          testCanvas.height = 4;
+          const ctx = testCanvas.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(0, 0, 4, 4);
+          }
+          const url = testCanvas.toDataURL('image/webp', 0.9);
+          nativeWebpSupported = typeof url === 'string' && url.startsWith('data:image/webp');
+        } catch (err) {
+          nativeWebpSupported = false;
+        }
+        webpCodecBadgeEl.textContent = nativeWebpSupported
+          ? 'WebP nativo activo'
+          : 'PNG → WebP fallback';
+      }
+
       function buildEmbedSnippet() {
         const srcUrl = (window.location && window.location.href && window.location.href.startsWith('http'))
           ? window.location.href
-          : 'https://example.com/vw-polo-mk4-v11.html';
+          : 'https://example.com/vw-polo-mk4-v12.html';
         return [
           '<div style="width:100%;height:580px;max-width:100%;border-radius:14px;overflow:hidden;background:#090d16;">',
-          `  <iframe src="${srcUrl}" title="VW Polo MK4 3 Puertas Visor 3D v11"`,
+          `  <iframe src="${srcUrl}" title="VW Polo MK4 3 Puertas Visor 3D v12"`,
           '    style="width:100%;height:100%;border:0;display:block;"',
           '    allow="accelerometer; autoplay; encrypted-media; gyroscope; fullscreen" allowfullscreen></iframe>',
           '</div>'
@@ -927,7 +999,6 @@
         }
 
         try {
-          // preserveDrawingBuffer: true ensures clean PNG captures at any moment
           renderer = new THREE.WebGLRenderer({
             canvas: canvasEl,
             antialias: true,
@@ -991,7 +1062,6 @@
         underLight.position.set(0.0, -5.0, 2.5);
         scene.add(underLight);
 
-        // Ground grid at Y = 0
         gridHelper = new THREE.GridHelper(18, 24, 0x3b82f6, 0x1e293b);
         gridHelper.position.y = 0;
         if (Array.isArray(gridHelper.material)) {
@@ -1014,7 +1084,6 @@
         shadowFloor.receiveShadow = true;
         scene.add(shadowFloor);
 
-        // modelPivot holds the active car and receives all manual rotations/translations/scale
         modelPivot = new THREE.Group();
         modelPivot.name = 'VW_Polo_MK4_Manual_Pose_Pivot';
         scene.add(modelPivot);
@@ -1290,11 +1359,6 @@
       // =========================================================================
       // 5. POSE MANAGEMENT (NON-DESTRUCTIVE, RESPECTS USER ROTATIONS)
       // =========================================================================
-      /**
-       * Centers a newly loaded or built-in child mesh around its own local origin
-       * and scales its largest dimension to ~4.0m so manual rotations around
-       * X, Y, Z pivot naturally around the car's center.
-       */
       function centerAndScaleInitial(childObj, targetSpan = 4.0) {
         if (!childObj) return;
         childObj.position.set(0, 0, 0);
@@ -1379,6 +1443,7 @@
       }
 
       function updateGeometryStats(targetObj, sourceLabel) {
+        activeSourceName = sourceLabel;
         infoSourceEl.textContent = sourceLabel;
         if (!targetObj) {
           infoGeometryEl.textContent = 'Modo 2D';
@@ -1424,15 +1489,8 @@
 
       function toggleSideOrVerticalPose() {
         sideToggleState = !sideToggleState;
-        if (sideToggleState) {
-          // Lateral/tilted inspection pose (90° roll around Z)
-          poseState.rx = 0;
-          poseState.rz = 90;
-        } else {
-          // Back to upright horizontal pose
-          poseState.rx = 0;
-          poseState.rz = 0;
-        }
+        poseState.rx = 0;
+        poseState.rz = sideToggleState ? 90 : 0;
         syncPoseControlsFromState();
         applyPoseToPivot();
         showToast(sideToggleState ? 'Pose lateral/vertical (Z = 90°)' : 'Pose horizontal (Z = 0°)');
@@ -1526,10 +1584,9 @@
                 centerAndScaleInitial(importedModel, 4.0);
                 modelPivot.add(importedModel);
 
-                // Keep user's chosen pose intact so they can orient it freely
                 applyPoseToPivot();
                 updateGeometryStats(importedModel, file.name);
-                showToast(`Cargado ${file.name} — ajústalo a tu gusto`);
+                showToast(`Cargado ${file.name} — conservando tu pose`);
               },
               () => showToast('Error al interpretar el archivo .glb/.gltf')
             );
@@ -1541,7 +1598,7 @@
       }
 
       // =========================================================================
-      // 7. CAMERA ORBIT & POSE-BASED CAPTURE SYSTEM
+      // 7. WEBP CONVERSION, 23-SHOT DEFINITION & auto.json GENERATOR
       // =========================================================================
       function applyCameraSpherical() {
         if (!camera) return;
@@ -1582,25 +1639,125 @@
         }
       }
 
-      function triggerPngDownload(dataUrl, filename) {
+      /**
+       * Converts the rendered canvas into a WebP data URL (with an automatic
+       * PNG-to-WebP 2D canvas fallback if direct toDataURL('image/webp') is not
+       * produced by the browser/sandbox).
+       */
+      function canvasToWebpDataUrl(sourceCanvas, quality = 0.9) {
+        try {
+          const directUrl = sourceCanvas.toDataURL('image/webp', quality);
+          if (typeof directUrl === 'string' && directUrl.startsWith('data:image/webp')) {
+            return directUrl;
+          }
+        } catch (err) {
+          // Proceed to PNG -> 2D canvas -> WebP fallback
+        }
+
+        try {
+          const pngUrl = sourceCanvas.toDataURL('image/png');
+          const offscreen = document.createElement('canvas');
+          offscreen.width = sourceCanvas.width || 640;
+          offscreen.height = sourceCanvas.height || 360;
+          const ctx = offscreen.getContext('2d');
+          if (!ctx) return pngUrl;
+
+          const tempImg = new Image();
+          tempImg.src = pngUrl;
+          // Draw synchronously if already decoded, otherwise fallback to pngUrl
+          if (tempImg.complete && tempImg.naturalWidth > 0) {
+            ctx.drawImage(tempImg, 0, 0, offscreen.width, offscreen.height);
+            const converted = offscreen.toDataURL('image/webp', quality);
+            if (typeof converted === 'string' && converted.startsWith('data:image/webp')) {
+              return converted;
+            }
+          }
+          return pngUrl;
+        } catch (err) {
+          return sourceCanvas.toDataURL('image/png');
+        }
+      }
+
+      function triggerFileDownload(dataUrlOrText, filename, isJsonText = false) {
         const link = document.createElement('a');
-        link.href = dataUrl;
+        if (isJsonText) {
+          const blob = new Blob([dataUrlOrText], { type: 'application/json;charset=utf-8' });
+          link.href = URL.createObjectURL(blob);
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(link.href), 1500);
+          return;
+        }
+
+        link.href = dataUrlOrText;
         link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       }
 
+      /**
+       * Builds the 23 pose-relative camera viewpoints (18 turntable ring angles
+       * around the posed car + 5 elevated/3-4/top/low pose angles = 23 total).
+       */
+      function build23PoseAngles(baseYawRad) {
+        const angles = [];
+
+        // 18 turntable ring views every 20° around the posed model's Y axis
+        for (let i = 0; i < 18; i++) {
+          const deg = i * 20;
+          const rad = THREE.MathUtils.degToRad(deg);
+          angles.push({
+            index: i + 1,
+            file: `auto_${String(i + 1).padStart(2, '0')}.webp`,
+            name: `Giro ${deg}°`,
+            category: 'ring_360',
+            yawRelDeg: deg,
+            yaw: baseYawRad + rad,
+            phi: Math.PI * 0.41,
+            radiusScale: 1.0
+          });
+        }
+
+        // 5 specialized elevation & 3/4 inspection angles (shots 19..23)
+        const extraShots = [
+          { name: '3/4 Frontal Alto', category: 'elevated_34', yawRelDeg: 35, phi: 0.62, radiusScale: 1.05 },
+          { name: '3/4 Trasero Alto', category: 'elevated_34', yawRelDeg: 145, phi: 0.62, radiusScale: 1.05 },
+          { name: 'Cenital / Techo', category: 'top_down', yawRelDeg: 0, phi: 0.16, radiusScale: 1.12 },
+          { name: '3/4 Bajo Deportivo', category: 'low_angle', yawRelDeg: -38, phi: 1.52, radiusScale: 1.02 },
+          { name: '3/4 Trasero Bajo', category: 'low_angle', yawRelDeg: -142, phi: 1.50, radiusScale: 1.02 }
+        ];
+
+        extraShots.forEach((ex, idx) => {
+          const num = 19 + idx;
+          angles.push({
+            index: num,
+            file: `auto_${String(num).padStart(2, '0')}.webp`,
+            name: ex.name,
+            category: ex.category,
+            yawRelDeg: ex.yawRelDeg,
+            yaw: baseYawRad + THREE.MathUtils.degToRad(ex.yawRelDeg),
+            phi: ex.phi,
+            radiusScale: ex.radiusScale
+          });
+        });
+
+        return angles;
+      }
+
       function renderGalleryUI() {
         galleryCountEl.textContent = String(sessionCaptures.length);
-        const hasItems = sessionCaptures.length > 0;
-        btnDownloadAllCaptures.disabled = !hasItems;
-        btnClearCaptures.disabled = !hasItems;
+        const hasCaptures = sessionCaptures.length > 0;
+        btnDownloadAllWebp.disabled = !hasCaptures;
+        btnDownloadAllGallery.disabled = !hasCaptures;
+        btnClearCaptures.disabled = !hasCaptures;
 
-        if (!hasItems) {
+        if (!hasCaptures) {
           capturesGalleryEl.innerHTML =
             '<div class="col-span-2 text-center py-4 text-[11px] text-slate-400 rounded-lg bg-slate-900/50 border border-slate-800/80">' +
-            'Aún no hay capturas. Usa "Capturar vista actual" o "Generar pack de capturas según mi pose".' +
+            'Aún no hay capturas. Pulsa "Generar 23 WebP + auto.json según mi pose".' +
             '</div>';
           return;
         }
@@ -1612,18 +1769,18 @@
 
           const img = document.createElement('img');
           img.src = cap.dataUrl;
-          img.alt = cap.label;
+          img.alt = cap.filename;
 
           const title = document.createElement('div');
-          title.className = 'text-[10.5px] font-medium text-slate-200 truncate';
-          title.textContent = cap.label;
+          title.className = 'text-[10px] font-medium text-slate-200 truncate';
+          title.textContent = `${cap.filename} • ${cap.label}`;
 
           const dlBtn = document.createElement('button');
           dlBtn.type = 'button';
           dlBtn.className = 'ui-btn w-full !min-h-0 !py-1 text-[10px]';
-          dlBtn.textContent = '⬇️ PNG';
+          dlBtn.textContent = '⬇️ WebP';
           dlBtn.addEventListener('click', () => {
-            triggerPngDownload(cap.dataUrl, cap.filename);
+            triggerFileDownload(cap.dataUrl, cap.filename, false);
           });
 
           card.appendChild(img);
@@ -1633,119 +1790,177 @@
         });
       }
 
-      function captureCurrentCanvas(customLabel, slugName, autoDownload) {
+      function captureSingleWebpView() {
         renderImmediateFrame();
-        let dataUrl = '';
-        try {
-          dataUrl = canvasEl.toDataURL('image/png');
-        } catch (err) {
-          showToast('No se pudo exportar el PNG desde el lienzo');
-          return null;
-        }
-
+        const webpUrl = canvasToWebpDataUrl(canvasEl, 0.92);
         const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        const poseTag = `X${Math.round(poseState.rx)}_Y${Math.round(poseState.ry)}_Z${Math.round(poseState.rz)}`;
-        const safeSlug = slugName || 'vista_actual';
-        const filename = `polo_mk4_${safeSlug}_${poseTag}_${stamp}.png`;
-        const label = customLabel || `Vista (${Math.round(poseState.rx)}°, ${Math.round(poseState.ry)}°, ${Math.round(poseState.rz)}°)`;
+        const filename = `polo_mk4_pose_X${Math.round(poseState.rx)}_Y${Math.round(poseState.ry)}_Z${Math.round(poseState.rz)}_${stamp}.webp`;
+        const label = `Pose (${Math.round(poseState.rx)}°, ${Math.round(poseState.ry)}°, ${Math.round(poseState.rz)}°)`;
 
         const entry = {
           id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
           label,
           filename,
-          dataUrl
+          dataUrl: webpUrl,
+          isWebp: webpUrl.startsWith('data:image/webp'),
+          shotIndex: null
         };
 
         sessionCaptures.unshift(entry);
         renderGalleryUI();
-
-        if (autoDownload) {
-          triggerPngDownload(dataUrl, filename);
-        }
-        return entry;
+        triggerFileDownload(webpUrl, filename, false);
+        showToast(`Captura guardada: ${filename}`);
       }
 
       /**
-       * Generates a batch of captures computed relative to the user's current
-       * model pose so every angle reflects how the user placed and rotated the car.
+       * Generates all 23 WebP images (`auto_01.webp` .. `auto_23.webp`) based on
+       * the model's current pose, builds `auto.json`, updates UI preview & gallery,
+       * and triggers downloads of the 23 WebP files plus `auto.json`.
        */
-      function generatePoseRelativePack() {
+      function generate23WebpAndAutoJson() {
         if (isGeneratingPack) return;
         isGeneratingPack = true;
+
+        btnGenerate23Webp.disabled = true;
+        quick23WebpJson.disabled = true;
+        webpProgressBarEl.style.width = '0%';
 
         const savedTarget = camOrbit.target.clone();
         const savedSpherical = camOrbit.spherical.clone();
 
-        const modelCenter = getCurrentModelWorldCenter();
         applyPoseToPivot();
+        const modelCenter = getCurrentModelWorldCenter();
 
-        // Compute model bounding radius so camera frames the posed car cleanly
-        let radius = 5.6;
+        let baseRadius = 5.6;
         if (modelPivot) {
           const box = new THREE.Box3().setFromObject(modelPivot);
           const sphere = new THREE.Sphere();
           box.getBoundingSphere(sphere);
           if (Number.isFinite(sphere.radius) && sphere.radius > 0.2) {
-            radius = THREE.MathUtils.clamp(sphere.radius * 2.55, 3.6, 12.0);
+            baseRadius = THREE.MathUtils.clamp(sphere.radius * 2.5, 3.6, 12.5);
           }
         }
 
-        // Yaw offset incorporates the model's current Y rotation so "Frontal",
-        // "Trasera", "Lat. Izq" and "Lat. Der" align with the posed car's orientation
-        const modelYawRad = THREE.MathUtils.degToRad(poseState.ry);
-
-        const poseAngles = [
-          { name: 'Frontal', slug: 'frontal', yaw: modelYawRad, phi: Math.PI * 0.42 },
-          { name: 'Trasera', slug: 'trasera', yaw: modelYawRad + Math.PI, phi: Math.PI * 0.42 },
-          { name: 'Lat. Izquierda', slug: 'lat_izq', yaw: modelYawRad - Math.PI * 0.5, phi: Math.PI * 0.44 },
-          { name: 'Lat. Derecha', slug: 'lat_der', yaw: modelYawRad + Math.PI * 0.5, phi: Math.PI * 0.44 },
-          { name: 'Superior', slug: 'superior', yaw: modelYawRad + 0.35, phi: 0.22 },
-          { name: '3/4 Pose', slug: 'tres_cuartos', yaw: modelYawRad + 0.68, phi: Math.PI * 0.34 }
-        ];
+        const baseYawRad = THREE.MathUtils.degToRad(poseState.ry);
+        const shots = build23PoseAngles(baseYawRad);
+        const generatedItems = [];
 
         camOrbit.target.copy(modelCenter);
 
-        let index = 0;
-        function stepNextCapture() {
-          if (index >= poseAngles.length) {
-            // Restore user's previous camera framing cleanly
+        let idx = 0;
+        function processNextShot() {
+          if (idx >= shots.length) {
+            // Restore original camera orbit cleanly
             camOrbit.target.copy(savedTarget);
             camOrbit.spherical.copy(savedSpherical);
             applyCameraSpherical();
             renderImmediateFrame();
 
+            // Build auto.json manifest reflecting exact user pose + 23 WebP files
+            const manifestObj = {
+              schema: 'vw_polo_mk4_auto_manifest_v12',
+              generatedAt: new Date().toISOString(),
+              modelSource: activeSourceName,
+              totalImages: generatedItems.length,
+              format: 'image/webp',
+              pose: {
+                rotationDeg: {
+                  x: poseState.rx,
+                  y: poseState.ry,
+                  z: poseState.rz
+                },
+                positionMeters: {
+                  x: poseState.px,
+                  y: poseState.py,
+                  z: poseState.pz
+                },
+                scale: poseState.scale,
+                worldCenter: {
+                  x: Math.round(modelCenter.x * 1000) / 1000,
+                  y: Math.round(modelCenter.y * 1000) / 1000,
+                  z: Math.round(modelCenter.z * 1000) / 1000
+                }
+              },
+              frames: generatedItems.map((it) => ({
+                index: it.index,
+                file: it.file,
+                label: it.name,
+                category: it.category,
+                relativeYawDeg: it.yawRelDeg,
+                cameraElevationDeg: Math.round(THREE.MathUtils.radToDeg(Math.PI * 0.5 - it.phi) * 10) / 10,
+                cameraDistance: Math.round(it.distance * 1000) / 1000
+              }))
+            };
+
+            latestAutoJsonText = JSON.stringify(manifestObj, null, 2);
+            latestBatchItems = generatedItems.slice();
+
+            autoJsonPreviewEl.value = latestAutoJsonText;
+            btnDownloadAutoJson.disabled = false;
+            btnCopyAutoJson.disabled = false;
+
+            // Prepend the 23 new captures to gallery
+            for (let k = generatedItems.length - 1; k >= 0; k--) {
+              const g = generatedItems[k];
+              sessionCaptures.unshift({
+                id: `auto23_${g.index}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                label: g.name,
+                filename: g.file,
+                dataUrl: g.dataUrl,
+                isWebp: g.dataUrl.startsWith('data:image/webp'),
+                shotIndex: g.index
+              });
+            }
+            renderGalleryUI();
+
+            // Download auto.json
+            triggerFileDownload(latestAutoJsonText, 'auto.json', true);
+
             isGeneratingPack = false;
+            btnGenerate23Webp.disabled = false;
+            quick23WebpJson.disabled = false;
+            webpProgressBarEl.style.width = '100%';
             captureProgressLabel.textContent =
-              `Pack generado (${poseAngles.length} vistas) según tu pose X:${Math.round(poseState.rx)}° Y:${Math.round(poseState.ry)}° Z:${Math.round(poseState.rz)}°.`;
+              `Completado: 23 WebP (auto_01.webp – auto_23.webp) + auto.json descargados.`;
             studioPanelEl.classList.add('open');
             btnOpenStudio.classList.add('active');
-            showToast('Pack de 6 capturas generado según tu pose');
+            showToast('23 WebP + auto.json generados según tu pose');
             return;
           }
 
-          const shot = poseAngles[index];
-          captureProgressLabel.textContent = `Capturando ${index + 1}/${poseAngles.length}: ${shot.name}...`;
-
-          camOrbit.spherical.radius = radius;
+          const shot = shots[idx];
+          const shotDist = baseRadius * shot.radiusScale;
+          camOrbit.spherical.radius = shotDist;
           camOrbit.spherical.phi = shot.phi;
           camOrbit.spherical.theta = shot.yaw;
           applyCameraSpherical();
           renderImmediateFrame();
 
-          const cap = captureCurrentCanvas(
-            `${shot.name} (X:${Math.round(poseState.rx)}° Y:${Math.round(poseState.ry)}° Z:${Math.round(poseState.rz)}°)`,
-            shot.slug,
-            false
-          );
-          if (cap) {
-            triggerPngDownload(cap.dataUrl, cap.filename);
-          }
+          const webpUrl = canvasToWebpDataUrl(canvasEl, 0.9);
+          generatedItems.push({
+            index: shot.index,
+            file: shot.file,
+            name: shot.name,
+            category: shot.category,
+            yawRelDeg: shot.yawRelDeg,
+            phi: shot.phi,
+            distance: shotDist,
+            dataUrl: webpUrl
+          });
 
-          index += 1;
-          setTimeout(stepNextCapture, 90);
+          // Trigger WebP download
+          triggerFileDownload(webpUrl, shot.file, false);
+
+          const pct = Math.round(((idx + 1) / shots.length) * 100);
+          webpProgressBarEl.style.width = `${pct}%`;
+          captureProgressLabel.textContent =
+            `Generando ${idx + 1}/${shots.length}: ${shot.file} (${shot.name})...`;
+
+          idx += 1;
+          setTimeout(processNextShot, 75);
         }
 
-        stepNextCapture();
+        processNextShot();
       }
 
       // =========================================================================
@@ -1770,7 +1985,6 @@
         bindRotPair(rotYSlider, rotYNum, 'ry');
         bindRotPair(rotZSlider, rotZNum, 'rz');
 
-        // Fine step buttons (-5, -1, +1, +5)
         document.querySelectorAll('.step-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
             const axis = btn.dataset.axis;
@@ -1781,7 +1995,6 @@
           });
         });
 
-        // Position X, Y, Z
         function bindPosPair(slider, numInput, readSpan, key, minV, maxV) {
           slider.addEventListener('input', () => {
             const v = THREE.MathUtils.clamp(parseFloat(slider.value) || 0, minV, maxV);
@@ -1805,7 +2018,6 @@
         bindPosPair(posYSlider, posYInput, posYRead, 'py', -2.5, 4);
         bindPosPair(posZSlider, posZInput, posZRead, 'pz', -5, 5);
 
-        // Scale
         scaleSlider.addEventListener('input', () => {
           poseState.scale = THREE.MathUtils.clamp(parseFloat(scaleSlider.value) || 1, 0.2, 3.0);
           scaleInput.value = poseState.scale.toFixed(2);
@@ -1819,7 +2031,6 @@
           applyPoseToPivot();
         });
 
-        // Quick pose helpers
         btnGroundY0.addEventListener('click', groundModelToY0);
         btnSideUpright.addEventListener('click', toggleSideOrVerticalPose);
         btnResetPose.addEventListener('click', resetPoseToZero);
@@ -1846,7 +2057,6 @@
           btnOpenStudio.classList.remove('active');
         });
 
-        // Drag mode toggle: Camera vs Model rotation
         function setDragMode(mode) {
           dragInteractionMode = mode;
           dragModeCameraBtn.classList.toggle('active', mode === 'camera');
@@ -1856,7 +2066,6 @@
         dragModeCameraBtn.addEventListener('click', () => setDragMode('camera'));
         dragModeModelBtn.addEventListener('click', () => setDragMode('model'));
 
-        // File upload & drag/drop
         btnUploadGltf.addEventListener('click', () => fileInputEl.click());
         fileInputEl.addEventListener('change', (e) => {
           const file = e.target.files && e.target.files[0];
@@ -1884,29 +2093,56 @@
           if (file) handleModelFile(file);
         });
 
-        // Capture triggers
-        function handleSingleCapture() {
-          const item = captureCurrentCanvas(null, 'vista_actual', true);
-          if (item) showToast('Captura PNG descargada y guardada en galería');
-        }
-        btnCaptureCurrent.addEventListener('click', handleSingleCapture);
-        quickCapturePng.addEventListener('click', handleSingleCapture);
+        // Single WebP & 23 WebP + auto.json triggers
+        btnCaptureSingleWebp.addEventListener('click', captureSingleWebpView);
+        quickCaptureWebp.addEventListener('click', captureSingleWebpView);
 
-        btnGeneratePosePack.addEventListener('click', generatePoseRelativePack);
-        quickPackPng.addEventListener('click', generatePoseRelativePack);
+        btnGenerate23Webp.addEventListener('click', generate23WebpAndAutoJson);
+        quick23WebpJson.addEventListener('click', generate23WebpAndAutoJson);
 
-        btnDownloadAllCaptures.addEventListener('click', () => {
-          if (!sessionCaptures.length) return;
-          sessionCaptures.forEach((cap, idx) => {
-            setTimeout(() => triggerPngDownload(cap.dataUrl, cap.filename), idx * 120);
-          });
-          showToast(`Descargando ${sessionCaptures.length} capturas PNG`);
+        btnDownloadAutoJson.addEventListener('click', () => {
+          if (!latestAutoJsonText) return;
+          triggerFileDownload(latestAutoJsonText, 'auto.json', true);
+          showToast('auto.json descargado');
         });
+
+        btnCopyAutoJson.addEventListener('click', () => {
+          if (!latestAutoJsonText) return;
+          autoJsonPreviewEl.focus();
+          autoJsonPreviewEl.select();
+          let ok = false;
+          try {
+            ok = document.execCommand('copy');
+          } catch (err) {
+            ok = false;
+          }
+          showToast(ok ? 'auto.json copiado al portapapeles' : 'Selecciona y copia el JSON');
+        });
+
+        function downloadAllStoredWebp() {
+          const items = latestBatchItems.length > 0
+            ? latestBatchItems.map((b) => ({ dataUrl: b.dataUrl, filename: b.file }))
+            : sessionCaptures.map((c) => ({ dataUrl: c.dataUrl, filename: c.filename }));
+          if (!items.length) return;
+          items.forEach((item, i) => {
+            setTimeout(() => triggerFileDownload(item.dataUrl, item.filename, false), i * 110);
+          });
+          showToast(`Descargando ${items.length} imágenes WebP`);
+        }
+
+        btnDownloadAllWebp.addEventListener('click', downloadAllStoredWebp);
+        btnDownloadAllGallery.addEventListener('click', downloadAllStoredWebp);
 
         btnClearCaptures.addEventListener('click', () => {
           sessionCaptures.length = 0;
+          latestBatchItems = [];
+          latestAutoJsonText = '';
+          autoJsonPreviewEl.value = '';
+          btnDownloadAutoJson.disabled = true;
+          btnCopyAutoJson.disabled = true;
+          webpProgressBarEl.style.width = '0%';
           renderGalleryUI();
-          showToast('Galería de capturas limpiada');
+          showToast('Capturas y auto.json limpiados');
         });
 
         // Paint swatches
@@ -1926,7 +2162,6 @@
           });
         });
 
-        // Studio lighting & floor grid & background
         studioLightSlider.addEventListener('input', () => {
           const val = parseFloat(studioLightSlider.value) || 1.25;
           studioLightValEl.textContent = `${val.toFixed(2)}×`;
@@ -1955,7 +2190,6 @@
 
         btnUseBuiltin.addEventListener('click', switchToBuiltinCar);
 
-        // Quick stage camera buttons
         quickResetCam.addEventListener('click', () => {
           camOrbit.target.copy(getCurrentModelWorldCenter());
           camOrbit.spherical.set(6.2, Math.PI * 0.36, Math.PI * 0.24);
@@ -1978,7 +2212,6 @@
           applyCameraSpherical();
         });
 
-        // Google Sites embed modal
         btnOpenEmbed.addEventListener('click', () => {
           embedSnippetArea.value = buildEmbedSnippet();
           embedModalEl.classList.add('open');
@@ -2209,9 +2442,10 @@
       }
 
       window.addEventListener('load', () => {
+        detectNativeWebpSupport();
         const webglOk = initThree();
         if (!webglOk) {
-          statusTextEl.textContent = 'Respaldo 2D activo • Pose manual habilitada';
+          statusTextEl.textContent = 'Respaldo 2D activo • Pose manual y 23 WebP habilitados';
           syncPoseControlsFromState();
           updateGeometryStats(null, 'Polo MK4 3P (Modo 2D)');
           resizeCanvas();
